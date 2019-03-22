@@ -1,0 +1,11 @@
+type Paper {
+  id: ID!
+  title: String!
+  pageNum: Int
+  pubDate: DateTime
+  coverImage: String
+  author: [Author]
+  currency: [Currency]
+  createAt: DateTime
+  version: Float
+}
