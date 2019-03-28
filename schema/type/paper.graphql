@@ -1,11 +1,11 @@
 type Paper {
-  id: ID!
-  title: String!
-  pageNum: Int
-  pubDate: DateTime
-  coverImage: String
+  id: ID! @unique
   author: [Author]
   currency: [Currency]
+  description: String
+  excerpt: String
+  file: [File]
+  pageNum: Int
+  title: String!
   createAt: DateTime
-  version: Float
 }

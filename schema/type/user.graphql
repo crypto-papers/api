@@ -1,6 +1,7 @@
-type Currency {
+type User {
   id: ID! @unique
+  email: String!
   name: String!
-  ticker: String
+  password: String!
   createAt: DateTime
 }

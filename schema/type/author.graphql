@@ -1,5 +1,6 @@
 type Author {
-  id: ID!
+  id: ID! @unique
   name: String
   psuedonym: Boolean
+  createAt: DateTime
 }

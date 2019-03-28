@@ -4,9 +4,35 @@ schema {
 }
 
 type Query {
+  author
   
+  currency
+
+  file
+  
+  user
+
+  paper
 }
 
 type Mutation {
+  createAuthor
+  deleteAuthor
+  updateAuthor
 
+  createCurrency
+  deleteCurrency
+  updateCurrency
+
+  createFile
+  deleteFile
+  updateFile
+  
+  createPaper
+  deletePaper
+  updatePaper
+
+  createUser
+  deletePaper
+  updatePaper
 }
