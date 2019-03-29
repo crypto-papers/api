@@ -3,14 +3,22 @@ package server
 import (
 	"fmt"
 	"net/http"
-	// "github.com/crypto-papers/Crytopapers_Graph_Api/schema"
+
+	"github.com/crypto-papers/Cryptopapers_Graph_Api/graphiql"
 )
 
-func index_handler(w http.ResponseWriter, r *http.Request) {
+func indexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello")
 }
 
+// StartServer initiates a web-server at port 3000
 func StartServer() {
-	http.HandleFunc("/", index_handler)
+	graphiqlHandler, err := graphiql.EndpointHandler("/graphiql")
+	if err != nil {
+		panic(err)
+	}
+
+	http.HandleFunc("/", indexHandler)
+	http.Handle("/graphiql", graphiqlHandler)
 	http.ListenAndServe(":3000", nil)
 }
