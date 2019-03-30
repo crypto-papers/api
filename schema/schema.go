@@ -1,10 +1,10 @@
+//go:generate go-bindata -ignore=\.go -pkg=schema -o=schema_bindata.go ./...
 package schema
 
-import (
-	"bytes"
-)
+import "bytes"
 
-func GetRootSchema() string {
+// GetParsableSchema converts the graphql schema into a string to be used by graphql-go
+func GetParsableSchema() string {
 	buf := bytes.Buffer{}
 	for _, name := range AssetNames() {
 		b := MustAsset(name)
