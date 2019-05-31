@@ -5,3 +5,4 @@
 </p>
 
 The CryptoPapers uses a Go implementation of GraphQL.
+

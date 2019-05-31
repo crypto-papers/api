@@ -19,11 +19,19 @@ var graphiqlTemplate = `
 <div id="graphiql" style="height: 100vh;">Loading...</div>
 <script>
 	function graphQLFetcher(graphQLParams) {
-		return fetch(window.location.origin + '/graphql', {
+		return fetch( "/query", {
 			method: 'post',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(graphQLParams),
-		}).then(response => response.json());
+		} )
+			.then( response => response.json() )
+			.then( function ( responseBody ) {
+				try {
+					return JSON.parse(reponseBody);
+				} catch (error) {
+					return responseBody
+				}
+			} );
 	}
 
 	ReactDOM.render(
