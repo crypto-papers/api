@@ -1,0 +1,7 @@
+type Author {
+  id: ID!
+  name: String!
+  papers: [Paper]
+  psuedonym: Boolean
+  # createAt: DateTime
+}

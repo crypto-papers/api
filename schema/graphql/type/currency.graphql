@@ -1,6 +1,0 @@
-type Currency {
-  id: ID! @unique
-  name: String!
-  ticker: String
-  createAt: DateTime
-}

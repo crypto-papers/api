@@ -1,5 +1,5 @@
 type Paper {
-  id: ID! @unique
+  id: ID!
   author: [Author]
   currency: [Currency]
   description: String
@@ -7,5 +7,5 @@ type Paper {
   file: [File]
   pageNum: Int
   title: String!
-  createAt: DateTime
+  # createAt: DateTime
 }

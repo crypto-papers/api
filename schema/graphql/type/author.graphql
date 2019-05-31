@@ -1,6 +1,0 @@
-type Author {
-  id: ID! @unique
-  name: String
-  psuedonym: Boolean
-  createAt: DateTime
-}

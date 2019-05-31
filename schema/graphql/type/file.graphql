@@ -1,9 +1,0 @@
-type File {
-  id: ID! @unique
-  coverImage: String
-  pubDate: DateTime
-  source: String
-  url: String
-  version: Float
-  createAt: DateTime
-}
