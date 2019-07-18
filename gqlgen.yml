@@ -1,21 +1,16 @@
-# .gqlgen.yml example
-#
-# Refer to https://gqlgen.com/config/
-# for detailed .gqlgen.yml documentation.
-
 schema:
   - ./schema/*.graphql
 
 exec:
-  filename: generated/exec.go
+  filename: generated/exec_gen.go
   package: generated
 model:
   filename: model/models_gen.go
   package: model
-models:
-  ID:
-    model:
-      - github.com/99designs/gqlgen/graphql.ID
 resolver:
   filename: resolver/resolver.go
   type: Resolver
+
+models:
+  ID:
+    model: github.com/99designs/gqlgen/graphql.ID
