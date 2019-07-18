@@ -7,11 +7,11 @@ import (
 )
 
 type Author struct {
-	ID        string     `json:"id"`
-	Name      string     `json:"name"`
-	Papers    []*Paper   `json:"papers"`
-	Psuedonym *bool      `json:"psuedonym"`
-	CreateAt  *time.Time `json:"createAt"`
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	Papers    []*Paper  `json:"papers"`
+	Psuedonym *bool     `json:"psuedonym"`
+	CreateAt  time.Time `json:"createAt"`
 }
 
 type CreateAuthorInput struct {
@@ -45,10 +45,10 @@ type CreateUserInput struct {
 }
 
 type Currency struct {
-	ID       string     `json:"id"`
-	Name     string     `json:"name"`
-	Ticker   string     `json:"ticker"`
-	CreateAt *time.Time `json:"createAt"`
+	ID       string    `json:"id"`
+	Name     string    `json:"name"`
+	Ticker   string    `json:"ticker"`
+	CreateAt time.Time `json:"createAt"`
 }
 
 type File struct {
@@ -58,7 +58,7 @@ type File struct {
 	Source     *string    `json:"source"`
 	URL        string     `json:"url"`
 	Version    *float64   `json:"version"`
-	CreateAt   *time.Time `json:"createAt"`
+	CreateAt   time.Time  `json:"createAt"`
 }
 
 type Paper struct {
@@ -70,7 +70,7 @@ type Paper struct {
 	File        []*File     `json:"file"`
 	PageNum     *int        `json:"pageNum"`
 	Title       string      `json:"title"`
-	CreateAt    *time.Time  `json:"createAt"`
+	CreateAt    time.Time   `json:"createAt"`
 }
 
 type UpdateAuthorInput struct {
@@ -104,9 +104,9 @@ type UpdateUserInput struct {
 }
 
 type User struct {
-	ID       string     `json:"id"`
-	Email    string     `json:"email"`
-	Name     string     `json:"name"`
-	Password string     `json:"password"`
-	CreateAt *time.Time `json:"createAt"`
+	ID       string    `json:"id"`
+	Email    string    `json:"email"`
+	Name     string    `json:"name"`
+	Password string    `json:"password"`
+	CreateAt time.Time `json:"createAt"`
 }

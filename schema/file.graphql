@@ -5,5 +5,5 @@ type File {
   source: String
   url: String!
   version: Float
-  createAt: Time
+  createAt: Time!
 }
