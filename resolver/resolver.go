@@ -71,15 +71,30 @@ type queryResolver struct{ *Resolver }
 func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
 	panic("not implemented")
 }
+func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
+	panic("not implemented")
+}
 func (r *queryResolver) Currency(ctx context.Context, id string) (*model.Currency, error) {
+	panic("not implemented")
+}
+func (r *queryResolver) Currencies(ctx context.Context) ([]*model.Currency, error) {
 	panic("not implemented")
 }
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
 	panic("not implemented")
 }
+func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
+	panic("not implemented")
+}
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	panic("not implemented")
 }
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	panic("not implemented")
+}
 func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, error) {
+	panic("not implemented")
+}
+func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 	panic("not implemented")
 }
