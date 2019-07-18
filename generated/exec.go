@@ -8,6 +8,8 @@ import (
 	"errors"
 	"strconv"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -43,6 +45,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Author struct {
+		CreateAt  func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Papers    func(childComplexity int) int
@@ -50,14 +53,17 @@ type ComplexityRoot struct {
 	}
 
 	Currency struct {
-		ID     func(childComplexity int) int
-		Name   func(childComplexity int) int
-		Ticker func(childComplexity int) int
+		CreateAt func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Ticker   func(childComplexity int) int
 	}
 
 	File struct {
 		CoverImage func(childComplexity int) int
+		CreateAt   func(childComplexity int) int
 		ID         func(childComplexity int) int
+		PubDate    func(childComplexity int) int
 		Source     func(childComplexity int) int
 		URL        func(childComplexity int) int
 		Version    func(childComplexity int) int
@@ -83,6 +89,7 @@ type ComplexityRoot struct {
 
 	Paper struct {
 		Author      func(childComplexity int) int
+		CreateAt    func(childComplexity int) int
 		Currency    func(childComplexity int) int
 		Description func(childComplexity int) int
 		Excerpt     func(childComplexity int) int
@@ -93,14 +100,20 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Author   func(childComplexity int, id string) int
-		Currency func(childComplexity int, id string) int
-		File     func(childComplexity int, id string) int
-		Paper    func(childComplexity int, id string) int
-		User     func(childComplexity int, id string) int
+		Author     func(childComplexity int, id string) int
+		Authors    func(childComplexity int) int
+		Currencies func(childComplexity int) int
+		Currency   func(childComplexity int, id string) int
+		File       func(childComplexity int, id string) int
+		Files      func(childComplexity int) int
+		Paper      func(childComplexity int, id string) int
+		Papers     func(childComplexity int) int
+		User       func(childComplexity int, id string) int
+		Users      func(childComplexity int) int
 	}
 
 	User struct {
+		CreateAt func(childComplexity int) int
 		Email    func(childComplexity int) int
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
@@ -127,10 +140,15 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Author(ctx context.Context, id string) (*model.Author, error)
+	Authors(ctx context.Context) ([]*model.Author, error)
 	Currency(ctx context.Context, id string) (*model.Currency, error)
+	Currencies(ctx context.Context) ([]*model.Currency, error)
 	File(ctx context.Context, id string) (*model.File, error)
+	Files(ctx context.Context) ([]*model.File, error)
 	User(ctx context.Context, id string) (*model.User, error)
+	Users(ctx context.Context) ([]*model.User, error)
 	Paper(ctx context.Context, id string) (*model.Paper, error)
+	Papers(ctx context.Context) ([]*model.Paper, error)
 }
 
 type executableSchema struct {
@@ -147,6 +165,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Author.createAt":
+		if e.complexity.Author.CreateAt == nil {
+			break
+		}
+
+		return e.complexity.Author.CreateAt(childComplexity), true
 
 	case "Author.id":
 		if e.complexity.Author.ID == nil {
@@ -176,6 +201,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.Psuedonym(childComplexity), true
 
+	case "Currency.createAt":
+		if e.complexity.Currency.CreateAt == nil {
+			break
+		}
+
+		return e.complexity.Currency.CreateAt(childComplexity), true
+
 	case "Currency.id":
 		if e.complexity.Currency.ID == nil {
 			break
@@ -204,12 +236,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.File.CoverImage(childComplexity), true
 
+	case "File.createAt":
+		if e.complexity.File.CreateAt == nil {
+			break
+		}
+
+		return e.complexity.File.CreateAt(childComplexity), true
+
 	case "File.id":
 		if e.complexity.File.ID == nil {
 			break
 		}
 
 		return e.complexity.File.ID(childComplexity), true
+
+	case "File.pubDate":
+		if e.complexity.File.PubDate == nil {
+			break
+		}
+
+		return e.complexity.File.PubDate(childComplexity), true
 
 	case "File.source":
 		if e.complexity.File.Source == nil {
@@ -419,6 +465,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paper.Author(childComplexity), true
 
+	case "Paper.createAt":
+		if e.complexity.Paper.CreateAt == nil {
+			break
+		}
+
+		return e.complexity.Paper.CreateAt(childComplexity), true
+
 	case "Paper.currency":
 		if e.complexity.Paper.Currency == nil {
 			break
@@ -480,6 +533,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Author(childComplexity, args["id"].(string)), true
 
+	case "Query.authors":
+		if e.complexity.Query.Authors == nil {
+			break
+		}
+
+		return e.complexity.Query.Authors(childComplexity), true
+
+	case "Query.currencies":
+		if e.complexity.Query.Currencies == nil {
+			break
+		}
+
+		return e.complexity.Query.Currencies(childComplexity), true
+
 	case "Query.currency":
 		if e.complexity.Query.Currency == nil {
 			break
@@ -504,6 +571,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.File(childComplexity, args["id"].(string)), true
 
+	case "Query.files":
+		if e.complexity.Query.Files == nil {
+			break
+		}
+
+		return e.complexity.Query.Files(childComplexity), true
+
 	case "Query.paper":
 		if e.complexity.Query.Paper == nil {
 			break
@@ -516,6 +590,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Paper(childComplexity, args["id"].(string)), true
 
+	case "Query.papers":
+		if e.complexity.Query.Papers == nil {
+			break
+		}
+
+		return e.complexity.Query.Papers(childComplexity), true
+
 	case "Query.user":
 		if e.complexity.Query.User == nil {
 			break
@@ -527,6 +608,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.User(childComplexity, args["id"].(string)), true
+
+	case "Query.users":
+		if e.complexity.Query.Users == nil {
+			break
+		}
+
+		return e.complexity.Query.Users(childComplexity), true
+
+	case "User.createAt":
+		if e.complexity.User.CreateAt == nil {
+			break
+		}
+
+		return e.complexity.User.CreateAt(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -638,22 +733,22 @@ var parsedSchema = gqlparser.MustLoadSchema(
   name: String!
   papers: [Paper]
   psuedonym: Boolean
-  # createAt: DateTime
+  createAt: Time
 }`},
 	&ast.Source{Name: "schema/currency.graphql", Input: `type Currency {
   id: ID!
   name: String!
   ticker: String!
-  # createAt: DateTime
+  createAt: Time
 }`},
 	&ast.Source{Name: "schema/file.graphql", Input: `type File {
   id: ID!
   coverImage: String
-  # pubDate: DateTime
+  pubDate: Time
   source: String
   url: String!
   version: Float
-  # createAt: DateTime
+  createAt: Time
 }`},
 	&ast.Source{Name: "schema/paper.graphql", Input: `type Paper {
   id: ID!
@@ -664,7 +759,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
   file: [File]
   pageNum: Int
   title: String!
-  # createAt: DateTime
+  createAt: Time
 }`},
 	&ast.Source{Name: "schema/schema.graphql", Input: `schema {
   query: Query
@@ -672,42 +767,63 @@ var parsedSchema = gqlparser.MustLoadSchema(
 }
 
 type Query {
-  author( id: ID! ): Author
-  currency( id: ID! ): Currency
-  file( id: ID! ): File
-  user( id: ID! ): User
-  paper( id: ID! ): Paper
+  author(id: ID!): Author
+  authors: [Author!]!
+  currency(id: ID!): Currency
+  currencies: [Currency!]!
+  file(id: ID!): File
+  files: [File!]!
+  user(id: ID!): User
+  users: [User!]!
+  paper(id: ID!): Paper
+  papers: [Paper!]!
 }
 
 type Mutation {
-  createAuthor( name: String! ): Author!
-  deleteAuthor( id: ID! ): Author!
-  updateAuthor( name: String!, psuedonym: Boolean ): Author!
+  createAuthor(name: String!): Author!
+  deleteAuthor(id: ID!): Author!
+  updateAuthor(name: String!, psuedonym: Boolean): Author!
 
-  createCurrency( name: String!, ticker: String! ): Currency!
-  deleteCurrency( id: ID! ): Currency!
-  updateCurrency( name: String!, ticker: String! ): Currency!
+  createCurrency(name: String!, ticker: String!): Currency!
+  deleteCurrency(id: ID!): Currency!
+  updateCurrency(name: String!, ticker: String!): Currency!
 
-  createFile( url: String! ): File!
-  deleteFile( id: ID! ): File!
-  updateFile( coverImage: String, source: String, url: String, version: Float ): File!
-  
-  createPaper( title: String!,description: String, excerpt: String, pageNum: Int ): Paper!
-  deletePaper( id: ID! ): Paper!
-  updatePaper( title: String, description: String, excerpt: String, pageNum: Int ): Paper!
+  createFile(url: String!): File!
+  deleteFile(id: ID!): File!
+  updateFile(
+    coverImage: String
+    source: String
+    url: String
+    version: Float
+  ): File!
 
-  createUser( name: String!, email: String!, password: String! ): User!
-  deleteUser( id: ID! ): User!
-  updateUser( name: String, email: String, password: String ): User!
+  createPaper(
+    title: String!
+    description: String
+    excerpt: String
+    pageNum: Int
+  ): Paper!
+  deletePaper(id: ID!): Paper!
+  updatePaper(
+    title: String
+    description: String
+    excerpt: String
+    pageNum: Int
+  ): Paper!
+
+  createUser(name: String!, email: String!, password: String!): User!
+  deleteUser(id: ID!): User!
+  updateUser(name: String, email: String, password: String): User!
 }
 
+scalar Time
 `},
 	&ast.Source{Name: "schema/user.graphql", Input: `type User {
   id: ID!
   email: String!
   name: String!
   password: String!
-  # createAt: DateTime
+  createAt: Time
 }`},
 )
 
@@ -1271,6 +1387,30 @@ func (ec *executionContext) _Author_psuedonym(ctx context.Context, field graphql
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Author_createAt(ctx context.Context, field graphql.CollectedField, obj *model.Author) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Author",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateAt, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Currency_id(ctx context.Context, field graphql.CollectedField, obj *model.Currency) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -1352,6 +1492,30 @@ func (ec *executionContext) _Currency_ticker(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Currency_createAt(ctx context.Context, field graphql.CollectedField, obj *model.Currency) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Currency",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateAt, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _File_id(ctx context.Context, field graphql.CollectedField, obj *model.File) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -1401,6 +1565,30 @@ func (ec *executionContext) _File_coverImage(ctx context.Context, field graphql.
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _File_pubDate(ctx context.Context, field graphql.CollectedField, obj *model.File) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "File",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PubDate, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _File_source(ctx context.Context, field graphql.CollectedField, obj *model.File) graphql.Marshaler {
@@ -1476,6 +1664,30 @@ func (ec *executionContext) _File_version(ctx context.Context, field graphql.Col
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _File_createAt(ctx context.Context, field graphql.CollectedField, obj *model.File) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "File",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateAt, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createAuthor(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2186,6 +2398,30 @@ func (ec *executionContext) _Paper_title(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Paper_createAt(ctx context.Context, field graphql.CollectedField, obj *model.Paper) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Paper",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateAt, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_author(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -2215,6 +2451,33 @@ func (ec *executionContext) _Query_author(ctx context.Context, field graphql.Col
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOAuthor2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_authors(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Authors(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Author)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNAuthor2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_currency(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2248,6 +2511,33 @@ func (ec *executionContext) _Query_currency(ctx context.Context, field graphql.C
 	return ec.marshalOCurrency2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCurrency(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_currencies(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Currencies(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Currency)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNCurrency2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCurrency(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_file(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -2277,6 +2567,33 @@ func (ec *executionContext) _Query_file(ctx context.Context, field graphql.Colle
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOFile2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_files(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Files(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.File)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFile2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2310,6 +2627,33 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	return ec.marshalOUser2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Users(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_paper(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -2339,6 +2683,33 @@ func (ec *executionContext) _Query_paper(ctx context.Context, field graphql.Coll
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOPaper2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐPaper(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_papers(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Papers(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Paper)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNPaper2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐPaper(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2502,6 +2873,30 @@ func (ec *executionContext) _User_password(ctx context.Context, field graphql.Co
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_createAt(ctx context.Context, field graphql.CollectedField, obj *model.User) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateAt, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) graphql.Marshaler {
@@ -3368,6 +3763,8 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Author_papers(ctx, field, obj)
 		case "psuedonym":
 			out.Values[i] = ec._Author_psuedonym(ctx, field, obj)
+		case "createAt":
+			out.Values[i] = ec._Author_createAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3405,6 +3802,8 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createAt":
+			out.Values[i] = ec._Currency_createAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3434,6 +3833,8 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "coverImage":
 			out.Values[i] = ec._File_coverImage(ctx, field, obj)
+		case "pubDate":
+			out.Values[i] = ec._File_pubDate(ctx, field, obj)
 		case "source":
 			out.Values[i] = ec._File_source(ctx, field, obj)
 		case "url":
@@ -3443,6 +3844,8 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "version":
 			out.Values[i] = ec._File_version(ctx, field, obj)
+		case "createAt":
+			out.Values[i] = ec._File_createAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3588,6 +3991,8 @@ func (ec *executionContext) _Paper(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createAt":
+			out.Values[i] = ec._Paper_createAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3625,6 +4030,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_author(ctx, field)
 				return res
 			})
+		case "authors":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_authors(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "currency":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3634,6 +4053,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_currency(ctx, field)
+				return res
+			})
+		case "currencies":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_currencies(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "file":
@@ -3647,6 +4080,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_file(ctx, field)
 				return res
 			})
+		case "files":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_files(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "user":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3658,6 +4105,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_user(ctx, field)
 				return res
 			})
+		case "users":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_users(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "paper":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3667,6 +4128,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_paper(ctx, field)
+				return res
+			})
+		case "papers":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_papers(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "__type":
@@ -3715,6 +4190,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createAt":
+			out.Values[i] = ec._User_createAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3975,6 +4452,43 @@ func (ec *executionContext) marshalNAuthor2githubᚗcomᚋcryptoᚑpapersᚋapi�
 	return ec._Author(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNAuthor2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v []*model.Author) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAuthor2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthor(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNAuthor2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v *model.Author) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
@@ -4003,6 +4517,43 @@ func (ec *executionContext) marshalNCurrency2githubᚗcomᚋcryptoᚑpapersᚋap
 	return ec._Currency(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNCurrency2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCurrency(ctx context.Context, sel ast.SelectionSet, v []*model.Currency) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCurrency2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCurrency(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNCurrency2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCurrency(ctx context.Context, sel ast.SelectionSet, v *model.Currency) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
@@ -4015,6 +4566,43 @@ func (ec *executionContext) marshalNCurrency2ᚖgithubᚗcomᚋcryptoᚑpapers�
 
 func (ec *executionContext) marshalNFile2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v model.File) graphql.Marshaler {
 	return ec._File(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFile2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v []*model.File) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFile2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v *model.File) graphql.Marshaler {
@@ -4045,6 +4633,43 @@ func (ec *executionContext) marshalNPaper2githubᚗcomᚋcryptoᚑpapersᚋapi�
 	return ec._Paper(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNPaper2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐPaper(ctx context.Context, sel ast.SelectionSet, v []*model.Paper) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPaper2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐPaper(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNPaper2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐPaper(ctx context.Context, sel ast.SelectionSet, v *model.Paper) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
@@ -4071,6 +4696,43 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
@@ -4603,6 +5265,29 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOString2string(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	return graphql.UnmarshalTime(v)
+}
+
+func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	return graphql.MarshalTime(v)
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOTime2timeᚐTime(ctx, sel, *v)
 }
 
 func (ec *executionContext) marshalOUser2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {

@@ -2,25 +2,33 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Author struct {
-	ID        string   `json:"id"`
-	Name      string   `json:"name"`
-	Papers    []*Paper `json:"papers"`
-	Psuedonym *bool    `json:"psuedonym"`
+	ID        string     `json:"id"`
+	Name      string     `json:"name"`
+	Papers    []*Paper   `json:"papers"`
+	Psuedonym *bool      `json:"psuedonym"`
+	CreateAt  *time.Time `json:"createAt"`
 }
 
 type Currency struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Ticker string `json:"ticker"`
+	ID       string     `json:"id"`
+	Name     string     `json:"name"`
+	Ticker   string     `json:"ticker"`
+	CreateAt *time.Time `json:"createAt"`
 }
 
 type File struct {
-	ID         string   `json:"id"`
-	CoverImage *string  `json:"coverImage"`
-	Source     *string  `json:"source"`
-	URL        string   `json:"url"`
-	Version    *float64 `json:"version"`
+	ID         string     `json:"id"`
+	CoverImage *string    `json:"coverImage"`
+	PubDate    *time.Time `json:"pubDate"`
+	Source     *string    `json:"source"`
+	URL        string     `json:"url"`
+	Version    *float64   `json:"version"`
+	CreateAt   *time.Time `json:"createAt"`
 }
 
 type Paper struct {
@@ -32,11 +40,13 @@ type Paper struct {
 	File        []*File     `json:"file"`
 	PageNum     *int        `json:"pageNum"`
 	Title       string      `json:"title"`
+	CreateAt    *time.Time  `json:"createAt"`
 }
 
 type User struct {
-	ID       string `json:"id"`
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	ID       string     `json:"id"`
+	Email    string     `json:"email"`
+	Name     string     `json:"name"`
+	Password string     `json:"password"`
+	CreateAt *time.Time `json:"createAt"`
 }
