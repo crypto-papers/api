@@ -70,21 +70,21 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateAuthor   func(childComplexity int, name string) int
-		CreateCurrency func(childComplexity int, name string, ticker string) int
-		CreateFile     func(childComplexity int, url string) int
-		CreatePaper    func(childComplexity int, title string, description *string, excerpt *string, pageNum *int) int
-		CreateUser     func(childComplexity int, name string, email string, password string) int
+		CreateAuthor   func(childComplexity int, data model.CreateAuthorInput) int
+		CreateCurrency func(childComplexity int, data model.CreateCurrencyInput) int
+		CreateFile     func(childComplexity int, data model.CreateFileInput) int
+		CreatePaper    func(childComplexity int, data model.CreatePaperInput) int
+		CreateUser     func(childComplexity int, data model.CreateUserInput) int
 		DeleteAuthor   func(childComplexity int, id string) int
 		DeleteCurrency func(childComplexity int, id string) int
 		DeleteFile     func(childComplexity int, id string) int
 		DeletePaper    func(childComplexity int, id string) int
 		DeleteUser     func(childComplexity int, id string) int
-		UpdateAuthor   func(childComplexity int, name string, psuedonym *bool) int
-		UpdateCurrency func(childComplexity int, name string, ticker string) int
-		UpdateFile     func(childComplexity int, coverImage *string, source *string, url *string, version *float64) int
-		UpdatePaper    func(childComplexity int, title *string, description *string, excerpt *string, pageNum *int) int
-		UpdateUser     func(childComplexity int, name *string, email *string, password *string) int
+		UpdateAuthor   func(childComplexity int, data model.UpdateAuthorInput) int
+		UpdateCurrency func(childComplexity int, data model.UpdateCurrencyInput) int
+		UpdateFile     func(childComplexity int, data model.UpdateFileInput) int
+		UpdatePaper    func(childComplexity int, data model.UpdatePaperInput) int
+		UpdateUser     func(childComplexity int, data model.UpdateUserInput) int
 	}
 
 	Paper struct {
@@ -122,21 +122,21 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateAuthor(ctx context.Context, name string) (*model.Author, error)
+	CreateAuthor(ctx context.Context, data model.CreateAuthorInput) (*model.Author, error)
 	DeleteAuthor(ctx context.Context, id string) (*model.Author, error)
-	UpdateAuthor(ctx context.Context, name string, psuedonym *bool) (*model.Author, error)
-	CreateCurrency(ctx context.Context, name string, ticker string) (*model.Currency, error)
+	UpdateAuthor(ctx context.Context, data model.UpdateAuthorInput) (*model.Author, error)
+	CreateCurrency(ctx context.Context, data model.CreateCurrencyInput) (*model.Currency, error)
 	DeleteCurrency(ctx context.Context, id string) (*model.Currency, error)
-	UpdateCurrency(ctx context.Context, name string, ticker string) (*model.Currency, error)
-	CreateFile(ctx context.Context, url string) (*model.File, error)
+	UpdateCurrency(ctx context.Context, data model.UpdateCurrencyInput) (*model.Currency, error)
+	CreateFile(ctx context.Context, data model.CreateFileInput) (*model.File, error)
 	DeleteFile(ctx context.Context, id string) (*model.File, error)
-	UpdateFile(ctx context.Context, coverImage *string, source *string, url *string, version *float64) (*model.File, error)
-	CreatePaper(ctx context.Context, title string, description *string, excerpt *string, pageNum *int) (*model.Paper, error)
+	UpdateFile(ctx context.Context, data model.UpdateFileInput) (*model.File, error)
+	CreatePaper(ctx context.Context, data model.CreatePaperInput) (*model.Paper, error)
 	DeletePaper(ctx context.Context, id string) (*model.Paper, error)
-	UpdatePaper(ctx context.Context, title *string, description *string, excerpt *string, pageNum *int) (*model.Paper, error)
-	CreateUser(ctx context.Context, name string, email string, password string) (*model.User, error)
+	UpdatePaper(ctx context.Context, data model.UpdatePaperInput) (*model.Paper, error)
+	CreateUser(ctx context.Context, data model.CreateUserInput) (*model.User, error)
 	DeleteUser(ctx context.Context, id string) (*model.User, error)
-	UpdateUser(ctx context.Context, name *string, email *string, password *string) (*model.User, error)
+	UpdateUser(ctx context.Context, data model.UpdateUserInput) (*model.User, error)
 }
 type QueryResolver interface {
 	Author(ctx context.Context, id string) (*model.Author, error)
@@ -288,7 +288,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateAuthor(childComplexity, args["name"].(string)), true
+		return e.complexity.Mutation.CreateAuthor(childComplexity, args["data"].(model.CreateAuthorInput)), true
 
 	case "Mutation.createCurrency":
 		if e.complexity.Mutation.CreateCurrency == nil {
@@ -300,7 +300,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateCurrency(childComplexity, args["name"].(string), args["ticker"].(string)), true
+		return e.complexity.Mutation.CreateCurrency(childComplexity, args["data"].(model.CreateCurrencyInput)), true
 
 	case "Mutation.createFile":
 		if e.complexity.Mutation.CreateFile == nil {
@@ -312,7 +312,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateFile(childComplexity, args["url"].(string)), true
+		return e.complexity.Mutation.CreateFile(childComplexity, args["data"].(model.CreateFileInput)), true
 
 	case "Mutation.createPaper":
 		if e.complexity.Mutation.CreatePaper == nil {
@@ -324,7 +324,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreatePaper(childComplexity, args["title"].(string), args["description"].(*string), args["excerpt"].(*string), args["pageNum"].(*int)), true
+		return e.complexity.Mutation.CreatePaper(childComplexity, args["data"].(model.CreatePaperInput)), true
 
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
@@ -336,7 +336,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateUser(childComplexity, args["name"].(string), args["email"].(string), args["password"].(string)), true
+		return e.complexity.Mutation.CreateUser(childComplexity, args["data"].(model.CreateUserInput)), true
 
 	case "Mutation.deleteAuthor":
 		if e.complexity.Mutation.DeleteAuthor == nil {
@@ -408,7 +408,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateAuthor(childComplexity, args["name"].(string), args["psuedonym"].(*bool)), true
+		return e.complexity.Mutation.UpdateAuthor(childComplexity, args["data"].(model.UpdateAuthorInput)), true
 
 	case "Mutation.updateCurrency":
 		if e.complexity.Mutation.UpdateCurrency == nil {
@@ -420,7 +420,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateCurrency(childComplexity, args["name"].(string), args["ticker"].(string)), true
+		return e.complexity.Mutation.UpdateCurrency(childComplexity, args["data"].(model.UpdateCurrencyInput)), true
 
 	case "Mutation.updateFile":
 		if e.complexity.Mutation.UpdateFile == nil {
@@ -432,7 +432,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateFile(childComplexity, args["coverImage"].(*string), args["source"].(*string), args["url"].(*string), args["version"].(*float64)), true
+		return e.complexity.Mutation.UpdateFile(childComplexity, args["data"].(model.UpdateFileInput)), true
 
 	case "Mutation.updatePaper":
 		if e.complexity.Mutation.UpdatePaper == nil {
@@ -444,7 +444,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdatePaper(childComplexity, args["title"].(*string), args["description"].(*string), args["excerpt"].(*string), args["pageNum"].(*int)), true
+		return e.complexity.Mutation.UpdatePaper(childComplexity, args["data"].(model.UpdatePaperInput)), true
 
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -456,7 +456,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateUser(childComplexity, args["name"].(*string), args["email"].(*string), args["password"].(*string)), true
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["data"].(model.UpdateUserInput)), true
 
 	case "Paper.author":
 		if e.complexity.Paper.Author == nil {
@@ -750,6 +750,67 @@ var parsedSchema = gqlparser.MustLoadSchema(
   version: Float
   createAt: Time
 }`},
+	&ast.Source{Name: "schema/inputs.graphql", Input: `# Inputs for mutations
+input CreateAuthorInput {
+  name: String!
+  psuedonym: Boolean
+}
+
+input UpdateAuthorInput {
+  name: String
+  psuedonym: Boolean
+}
+
+input CreateCurrencyInput {
+  name: String!
+  ticker: String!
+}
+
+input UpdateCurrencyInput {
+  name: String
+  ticker: String
+}
+
+input CreatePaperInput {
+  title: String!
+  description: String
+  excerpt: String
+  pageNum: Int
+}
+
+input UpdatePaperInput {
+  title: String
+  description: String
+  excerpt: String
+  pageNum: Int
+}
+
+input CreateFileInput {
+  coverImage: String
+  source: String
+  url: String
+  version: Float
+}
+
+input UpdateFileInput {
+  coverImage: String
+  source: String
+  url: String
+  version: Float
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  password: String
+}
+`},
 	&ast.Source{Name: "schema/paper.graphql", Input: `type Paper {
   id: ID!
   author: [Author]
@@ -766,6 +827,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
   mutation: Mutation
 }
 
+# List of available queries
 type Query {
   author(id: ID!): Author
   authors: [Author!]!
@@ -779,43 +841,31 @@ type Query {
   papers: [Paper!]!
 }
 
+# List of available mutations
 type Mutation {
-  createAuthor(name: String!): Author!
+  # Author mutations
+  createAuthor(data: CreateAuthorInput!): Author!
   deleteAuthor(id: ID!): Author!
-  updateAuthor(name: String!, psuedonym: Boolean): Author!
-
-  createCurrency(name: String!, ticker: String!): Currency!
+  updateAuthor(data: UpdateAuthorInput!): Author!
+  # Currency mutations
+  createCurrency(data: CreateCurrencyInput!): Currency!
   deleteCurrency(id: ID!): Currency!
-  updateCurrency(name: String!, ticker: String!): Currency!
-
-  createFile(url: String!): File!
+  updateCurrency(data: UpdateCurrencyInput!): Currency!
+  # File mutations
+  createFile(data: CreateFileInput!): File!
   deleteFile(id: ID!): File!
-  updateFile(
-    coverImage: String
-    source: String
-    url: String
-    version: Float
-  ): File!
-
-  createPaper(
-    title: String!
-    description: String
-    excerpt: String
-    pageNum: Int
-  ): Paper!
+  updateFile(data: UpdateFileInput!): File!
+  # Paper mutations
+  createPaper(data: CreatePaperInput!): Paper!
   deletePaper(id: ID!): Paper!
-  updatePaper(
-    title: String
-    description: String
-    excerpt: String
-    pageNum: Int
-  ): Paper!
-
-  createUser(name: String!, email: String!, password: String!): User!
+  updatePaper(data: UpdatePaperInput!): Paper!
+  # User mutations
+  createUser(data: CreateUserInput!): User!
   deleteUser(id: ID!): User!
-  updateUser(name: String, email: String, password: String): User!
+  updateUser(data: UpdateUserInput!): User!
 }
 
+# Scalar definitions
 scalar Time
 `},
 	&ast.Source{Name: "schema/user.graphql", Input: `type User {
@@ -834,118 +884,70 @@ scalar Time
 func (ec *executionContext) field_Mutation_createAuthor_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.CreateAuthorInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNCreateAuthorInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateAuthorInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_createCurrency_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.CreateCurrencyInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNCreateCurrencyInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateCurrencyInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["ticker"]; ok {
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["ticker"] = arg1
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_createFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["url"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.CreateFileInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNCreateFileInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateFileInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["url"] = arg0
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_createPaper_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["title"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.CreatePaperInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNCreatePaperInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreatePaperInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["title"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["description"]; ok {
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["description"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["excerpt"]; ok {
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["excerpt"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["pageNum"]; ok {
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["pageNum"] = arg3
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.CreateUserInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNCreateUserInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["email"]; ok {
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["email"] = arg1
-	var arg2 string
-	if tmp, ok := rawArgs["password"]; ok {
-		arg2, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["password"] = arg2
+	args["data"] = arg0
 	return args, nil
 }
 
@@ -1022,150 +1024,70 @@ func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_updateAuthor_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.UpdateAuthorInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNUpdateAuthorInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateAuthorInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
-	var arg1 *bool
-	if tmp, ok := rawArgs["psuedonym"]; ok {
-		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["psuedonym"] = arg1
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_updateCurrency_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.UpdateCurrencyInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNUpdateCurrencyInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateCurrencyInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["ticker"]; ok {
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["ticker"] = arg1
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_updateFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["coverImage"]; ok {
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	var arg0 model.UpdateFileInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNUpdateFileInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateFileInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["coverImage"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["source"]; ok {
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["source"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["url"]; ok {
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["url"] = arg2
-	var arg3 *float64
-	if tmp, ok := rawArgs["version"]; ok {
-		arg3, err = ec.unmarshalOFloat2ᚖfloat64(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["version"] = arg3
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_updatePaper_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["title"]; ok {
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	var arg0 model.UpdatePaperInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNUpdatePaperInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdatePaperInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["title"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["description"]; ok {
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["description"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["excerpt"]; ok {
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["excerpt"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["pageNum"]; ok {
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["pageNum"] = arg3
+	args["data"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	var arg0 model.UpdateUserInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["email"]; ok {
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["email"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["password"]; ok {
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["password"] = arg2
+	args["data"] = arg0
 	return args, nil
 }
 
@@ -1710,7 +1632,7 @@ func (ec *executionContext) _Mutation_createAuthor(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateAuthor(rctx, args["name"].(string))
+		return ec.resolvers.Mutation().CreateAuthor(rctx, args["data"].(model.CreateAuthorInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1778,7 +1700,7 @@ func (ec *executionContext) _Mutation_updateAuthor(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateAuthor(rctx, args["name"].(string), args["psuedonym"].(*bool))
+		return ec.resolvers.Mutation().UpdateAuthor(rctx, args["data"].(model.UpdateAuthorInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1812,7 +1734,7 @@ func (ec *executionContext) _Mutation_createCurrency(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateCurrency(rctx, args["name"].(string), args["ticker"].(string))
+		return ec.resolvers.Mutation().CreateCurrency(rctx, args["data"].(model.CreateCurrencyInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1880,7 +1802,7 @@ func (ec *executionContext) _Mutation_updateCurrency(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateCurrency(rctx, args["name"].(string), args["ticker"].(string))
+		return ec.resolvers.Mutation().UpdateCurrency(rctx, args["data"].(model.UpdateCurrencyInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1914,7 +1836,7 @@ func (ec *executionContext) _Mutation_createFile(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateFile(rctx, args["url"].(string))
+		return ec.resolvers.Mutation().CreateFile(rctx, args["data"].(model.CreateFileInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1982,7 +1904,7 @@ func (ec *executionContext) _Mutation_updateFile(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateFile(rctx, args["coverImage"].(*string), args["source"].(*string), args["url"].(*string), args["version"].(*float64))
+		return ec.resolvers.Mutation().UpdateFile(rctx, args["data"].(model.UpdateFileInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2016,7 +1938,7 @@ func (ec *executionContext) _Mutation_createPaper(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreatePaper(rctx, args["title"].(string), args["description"].(*string), args["excerpt"].(*string), args["pageNum"].(*int))
+		return ec.resolvers.Mutation().CreatePaper(rctx, args["data"].(model.CreatePaperInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2084,7 +2006,7 @@ func (ec *executionContext) _Mutation_updatePaper(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdatePaper(rctx, args["title"].(*string), args["description"].(*string), args["excerpt"].(*string), args["pageNum"].(*int))
+		return ec.resolvers.Mutation().UpdatePaper(rctx, args["data"].(model.UpdatePaperInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2118,7 +2040,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateUser(rctx, args["name"].(string), args["email"].(string), args["password"].(string))
+		return ec.resolvers.Mutation().CreateUser(rctx, args["data"].(model.CreateUserInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2186,7 +2108,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateUser(rctx, args["name"].(*string), args["email"].(*string), args["password"].(*string))
+		return ec.resolvers.Mutation().UpdateUser(rctx, args["data"].(model.UpdateUserInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -3730,6 +3652,306 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateAuthorInput(ctx context.Context, v interface{}) (model.CreateAuthorInput, error) {
+	var it model.CreateAuthorInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "psuedonym":
+			var err error
+			it.Psuedonym, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateCurrencyInput(ctx context.Context, v interface{}) (model.CreateCurrencyInput, error) {
+	var it model.CreateCurrencyInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ticker":
+			var err error
+			it.Ticker, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateFileInput(ctx context.Context, v interface{}) (model.CreateFileInput, error) {
+	var it model.CreateFileInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "coverImage":
+			var err error
+			it.CoverImage, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "source":
+			var err error
+			it.Source, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "url":
+			var err error
+			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "version":
+			var err error
+			it.Version, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreatePaperInput(ctx context.Context, v interface{}) (model.CreatePaperInput, error) {
+	var it model.CreatePaperInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "excerpt":
+			var err error
+			it.Excerpt, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pageNum":
+			var err error
+			it.PageNum, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
+	var it model.CreateUserInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateAuthorInput(ctx context.Context, v interface{}) (model.UpdateAuthorInput, error) {
+	var it model.UpdateAuthorInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "psuedonym":
+			var err error
+			it.Psuedonym, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateCurrencyInput(ctx context.Context, v interface{}) (model.UpdateCurrencyInput, error) {
+	var it model.UpdateCurrencyInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ticker":
+			var err error
+			it.Ticker, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateFileInput(ctx context.Context, v interface{}) (model.UpdateFileInput, error) {
+	var it model.UpdateFileInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "coverImage":
+			var err error
+			it.CoverImage, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "source":
+			var err error
+			it.Source, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "url":
+			var err error
+			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "version":
+			var err error
+			it.Version, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdatePaperInput(ctx context.Context, v interface{}) (model.UpdatePaperInput, error) {
+	var it model.UpdatePaperInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "excerpt":
+			var err error
+			it.Excerpt, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pageNum":
+			var err error
+			it.PageNum, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
+	var it model.UpdateUserInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -4513,6 +4735,26 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreateAuthorInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateAuthorInput(ctx context.Context, v interface{}) (model.CreateAuthorInput, error) {
+	return ec.unmarshalInputCreateAuthorInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNCreateCurrencyInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateCurrencyInput(ctx context.Context, v interface{}) (model.CreateCurrencyInput, error) {
+	return ec.unmarshalInputCreateCurrencyInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNCreateFileInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateFileInput(ctx context.Context, v interface{}) (model.CreateFileInput, error) {
+	return ec.unmarshalInputCreateFileInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNCreatePaperInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreatePaperInput(ctx context.Context, v interface{}) (model.CreatePaperInput, error) {
+	return ec.unmarshalInputCreatePaperInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
+	return ec.unmarshalInputCreateUserInput(ctx, v)
+}
+
 func (ec *executionContext) marshalNCurrency2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐCurrency(ctx context.Context, sel ast.SelectionSet, v model.Currency) graphql.Marshaler {
 	return ec._Currency(ctx, sel, &v)
 }
@@ -4692,6 +4934,26 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateAuthorInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateAuthorInput(ctx context.Context, v interface{}) (model.UpdateAuthorInput, error) {
+	return ec.unmarshalInputUpdateAuthorInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateCurrencyInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateCurrencyInput(ctx context.Context, v interface{}) (model.UpdateCurrencyInput, error) {
+	return ec.unmarshalInputUpdateCurrencyInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateFileInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateFileInput(ctx context.Context, v interface{}) (model.UpdateFileInput, error) {
+	return ec.unmarshalInputUpdateFileInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNUpdatePaperInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdatePaperInput(ctx context.Context, v interface{}) (model.UpdatePaperInput, error) {
+	return ec.unmarshalInputUpdatePaperInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
+	return ec.unmarshalInputUpdateUserInput(ctx, v)
 }
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {

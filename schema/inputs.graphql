@@ -1,0 +1,60 @@
+# Inputs for mutations
+input CreateAuthorInput {
+  name: String!
+  psuedonym: Boolean
+}
+
+input UpdateAuthorInput {
+  name: String
+  psuedonym: Boolean
+}
+
+input CreateCurrencyInput {
+  name: String!
+  ticker: String!
+}
+
+input UpdateCurrencyInput {
+  name: String
+  ticker: String
+}
+
+input CreatePaperInput {
+  title: String!
+  description: String
+  excerpt: String
+  pageNum: Int
+}
+
+input UpdatePaperInput {
+  title: String
+  description: String
+  excerpt: String
+  pageNum: Int
+}
+
+input CreateFileInput {
+  coverImage: String
+  source: String
+  url: String
+  version: Float
+}
+
+input UpdateFileInput {
+  coverImage: String
+  source: String
+  url: String
+  version: Float
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  password: String
+}

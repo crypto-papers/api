@@ -20,49 +20,49 @@ func (r *Resolver) Query() generated.QueryResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) CreateAuthor(ctx context.Context, name string) (*model.Author, error) {
+func (r *mutationResolver) CreateAuthor(context.Context, model.CreateAuthorInput) (*model.Author, error) {
 	panic("not implemented")
 }
 func (r *mutationResolver) DeleteAuthor(ctx context.Context, id string) (*model.Author, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdateAuthor(ctx context.Context, name string, psuedonym *bool) (*model.Author, error) {
+func (r *mutationResolver) UpdateAuthor(context.Context, model.UpdateAuthorInput) (*model.Author, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) CreateCurrency(ctx context.Context, name string, ticker string) (*model.Currency, error) {
+func (r *mutationResolver) CreateCurrency(context.Context, model.CreateCurrencyInput) (*model.Currency, error) {
 	panic("not implemented")
 }
 func (r *mutationResolver) DeleteCurrency(ctx context.Context, id string) (*model.Currency, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdateCurrency(ctx context.Context, name string, ticker string) (*model.Currency, error) {
+func (r *mutationResolver) UpdateCurrency(context.Context, model.UpdateCurrencyInput) (*model.Currency, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) CreateFile(ctx context.Context, url string) (*model.File, error) {
+func (r *mutationResolver) CreateFile(context.Context, model.CreateFileInput) (*model.File, error) {
 	panic("not implemented")
 }
 func (r *mutationResolver) DeleteFile(ctx context.Context, id string) (*model.File, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdateFile(ctx context.Context, coverImage *string, source *string, url *string, version *float64) (*model.File, error) {
+func (r *mutationResolver) UpdateFile(context.Context, model.UpdateFileInput) (*model.File, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) CreatePaper(ctx context.Context, title string, description *string, excerpt *string, pageNum *int) (*model.Paper, error) {
+func (r *mutationResolver) CreatePaper(context.Context, model.CreatePaperInput) (*model.Paper, error) {
 	panic("not implemented")
 }
 func (r *mutationResolver) DeletePaper(ctx context.Context, id string) (*model.Paper, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdatePaper(ctx context.Context, title *string, description *string, excerpt *string, pageNum *int) (*model.Paper, error) {
+func (r *mutationResolver) UpdatePaper(context.Context, model.UpdatePaperInput) (*model.Paper, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) CreateUser(ctx context.Context, name string, email string, password string) (*model.User, error) {
+func (r *mutationResolver) CreateUser(context.Context, model.CreateUserInput) (*model.User, error) {
 	panic("not implemented")
 }
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdateUser(ctx context.Context, name *string, email *string, password *string) (*model.User, error) {
+func (r *mutationResolver) UpdateUser(context.Context, model.UpdateUserInput) (*model.User, error) {
 	panic("not implemented")
 }
 

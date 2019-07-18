@@ -3,6 +3,7 @@ schema {
   mutation: Mutation
 }
 
+# List of available queries
 type Query {
   author(id: ID!): Author
   authors: [Author!]!
@@ -16,41 +17,29 @@ type Query {
   papers: [Paper!]!
 }
 
+# List of available mutations
 type Mutation {
-  createAuthor(name: String!): Author!
+  # Author mutations
+  createAuthor(data: CreateAuthorInput!): Author!
   deleteAuthor(id: ID!): Author!
-  updateAuthor(name: String!, psuedonym: Boolean): Author!
-
-  createCurrency(name: String!, ticker: String!): Currency!
+  updateAuthor(data: UpdateAuthorInput!): Author!
+  # Currency mutations
+  createCurrency(data: CreateCurrencyInput!): Currency!
   deleteCurrency(id: ID!): Currency!
-  updateCurrency(name: String!, ticker: String!): Currency!
-
-  createFile(url: String!): File!
+  updateCurrency(data: UpdateCurrencyInput!): Currency!
+  # File mutations
+  createFile(data: CreateFileInput!): File!
   deleteFile(id: ID!): File!
-  updateFile(
-    coverImage: String
-    source: String
-    url: String
-    version: Float
-  ): File!
-
-  createPaper(
-    title: String!
-    description: String
-    excerpt: String
-    pageNum: Int
-  ): Paper!
+  updateFile(data: UpdateFileInput!): File!
+  # Paper mutations
+  createPaper(data: CreatePaperInput!): Paper!
   deletePaper(id: ID!): Paper!
-  updatePaper(
-    title: String
-    description: String
-    excerpt: String
-    pageNum: Int
-  ): Paper!
-
-  createUser(name: String!, email: String!, password: String!): User!
+  updatePaper(data: UpdatePaperInput!): Paper!
+  # User mutations
+  createUser(data: CreateUserInput!): User!
   deleteUser(id: ID!): User!
-  updateUser(name: String, email: String, password: String): User!
+  updateUser(data: UpdateUserInput!): User!
 }
 
+# Scalar definitions
 scalar Time

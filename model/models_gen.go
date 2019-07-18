@@ -14,6 +14,36 @@ type Author struct {
 	CreateAt  *time.Time `json:"createAt"`
 }
 
+type CreateAuthorInput struct {
+	Name      string `json:"name"`
+	Psuedonym *bool  `json:"psuedonym"`
+}
+
+type CreateCurrencyInput struct {
+	Name   string `json:"name"`
+	Ticker string `json:"ticker"`
+}
+
+type CreateFileInput struct {
+	CoverImage *string  `json:"coverImage"`
+	Source     *string  `json:"source"`
+	URL        *string  `json:"url"`
+	Version    *float64 `json:"version"`
+}
+
+type CreatePaperInput struct {
+	Title       string  `json:"title"`
+	Description *string `json:"description"`
+	Excerpt     *string `json:"excerpt"`
+	PageNum     *int    `json:"pageNum"`
+}
+
+type CreateUserInput struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Currency struct {
 	ID       string     `json:"id"`
 	Name     string     `json:"name"`
@@ -41,6 +71,36 @@ type Paper struct {
 	PageNum     *int        `json:"pageNum"`
 	Title       string      `json:"title"`
 	CreateAt    *time.Time  `json:"createAt"`
+}
+
+type UpdateAuthorInput struct {
+	Name      *string `json:"name"`
+	Psuedonym *bool   `json:"psuedonym"`
+}
+
+type UpdateCurrencyInput struct {
+	Name   *string `json:"name"`
+	Ticker *string `json:"ticker"`
+}
+
+type UpdateFileInput struct {
+	CoverImage *string  `json:"coverImage"`
+	Source     *string  `json:"source"`
+	URL        *string  `json:"url"`
+	Version    *float64 `json:"version"`
+}
+
+type UpdatePaperInput struct {
+	Title       *string `json:"title"`
+	Description *string `json:"description"`
+	Excerpt     *string `json:"excerpt"`
+	PageNum     *int    `json:"pageNum"`
+}
+
+type UpdateUserInput struct {
+	Name     *string `json:"name"`
+	Email    *string `json:"email"`
+	Password *string `json:"password"`
 }
 
 type User struct {
