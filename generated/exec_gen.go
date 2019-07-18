@@ -740,8 +740,9 @@ var parsedSchema = gqlparser.MustLoadSchema(
   id: ID!
   name: String!
   ticker: String!
-  createAt: Time
-}`},
+  createAt: Time!
+}
+`},
 	&ast.Source{Name: "schema/file.graphql", Input: `type File {
   id: ID!
   coverImage: String
@@ -749,8 +750,9 @@ var parsedSchema = gqlparser.MustLoadSchema(
   source: String
   url: String!
   version: Float
-  createAt: Time
-}`},
+  createAt: Time!
+}
+`},
 	&ast.Source{Name: "schema/inputs.graphql", Input: `# Inputs for mutations
 input CreateAuthorInput {
   name: String!
@@ -772,6 +774,20 @@ input UpdateCurrencyInput {
   ticker: String
 }
 
+input CreateFileInput {
+  coverImage: String
+  source: String
+  url: String!
+  version: Float
+}
+
+input UpdateFileInput {
+  coverImage: String
+  source: String
+  url: String
+  version: Float
+}
+
 input CreatePaperInput {
   title: String!
   description: String
@@ -784,20 +800,6 @@ input UpdatePaperInput {
   description: String
   excerpt: String
   pageNum: Int
-}
-
-input CreateFileInput {
-  coverImage: String
-  source: String
-  url: String
-  version: Float
-}
-
-input UpdateFileInput {
-  coverImage: String
-  source: String
-  url: String
-  version: Float
 }
 
 input CreateUserInput {
@@ -821,8 +823,9 @@ input UpdateUserInput {
   file: [File]
   pageNum: Int
   title: String!
-  createAt: Time
-}`},
+  createAt: Time!
+}
+`},
 	&ast.Source{Name: "schema/schema.graphql", Input: `schema {
   query: Query
   mutation: Mutation
@@ -874,8 +877,9 @@ scalar Time
   email: String!
   name: String!
   password: String!
-  createAt: Time
-}`},
+  createAt: Time!
+}
+`},
 )
 
 // endregion ************************** generated!.gotpl **************************
@@ -1434,12 +1438,15 @@ func (ec *executionContext) _Currency_createAt(ctx context.Context, field graphq
 		return obj.CreateAt, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _File_id(ctx context.Context, field graphql.CollectedField, obj *model.File) graphql.Marshaler {
@@ -1608,12 +1615,15 @@ func (ec *executionContext) _File_createAt(ctx context.Context, field graphql.Co
 		return obj.CreateAt, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createAuthor(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2340,12 +2350,15 @@ func (ec *executionContext) _Paper_createAt(ctx context.Context, field graphql.C
 		return obj.CreateAt, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_author(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2817,12 +2830,15 @@ func (ec *executionContext) _User_createAt(ctx context.Context, field graphql.Co
 		return obj.CreateAt, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) graphql.Marshaler {
@@ -3724,7 +3740,7 @@ func (ec *executionContext) unmarshalInputCreateFileInput(ctx context.Context, v
 			}
 		case "url":
 			var err error
-			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.URL, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4033,6 +4049,9 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "createAt":
 			out.Values[i] = ec._Currency_createAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4075,6 +4094,9 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._File_version(ctx, field, obj)
 		case "createAt":
 			out.Values[i] = ec._File_createAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4222,6 +4244,9 @@ func (ec *executionContext) _Paper(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "createAt":
 			out.Values[i] = ec._Paper_createAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4421,6 +4446,9 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "createAt":
 			out.Values[i] = ec._User_createAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

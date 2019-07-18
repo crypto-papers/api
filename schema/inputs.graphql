@@ -19,6 +19,20 @@ input UpdateCurrencyInput {
   ticker: String
 }
 
+input CreateFileInput {
+  coverImage: String
+  source: String
+  url: String!
+  version: Float
+}
+
+input UpdateFileInput {
+  coverImage: String
+  source: String
+  url: String
+  version: Float
+}
+
 input CreatePaperInput {
   title: String!
   description: String
@@ -31,20 +45,6 @@ input UpdatePaperInput {
   description: String
   excerpt: String
   pageNum: Int
-}
-
-input CreateFileInput {
-  coverImage: String
-  source: String
-  url: String
-  version: Float
-}
-
-input UpdateFileInput {
-  coverImage: String
-  source: String
-  url: String
-  version: Float
 }
 
 input CreateUserInput {

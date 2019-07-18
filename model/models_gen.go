@@ -27,7 +27,7 @@ type CreateCurrencyInput struct {
 type CreateFileInput struct {
 	CoverImage *string  `json:"coverImage"`
 	Source     *string  `json:"source"`
-	URL        *string  `json:"url"`
+	URL        string   `json:"url"`
 	Version    *float64 `json:"version"`
 }
 
