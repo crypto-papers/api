@@ -7,5 +7,5 @@ type Paper {
   file: [File]
   pageNum: Int
   title: String!
-  # createAt: DateTime
+  createAt: Time
 }

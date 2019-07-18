@@ -2,5 +2,5 @@ type Currency {
   id: ID!
   name: String!
   ticker: String!
-  # createAt: DateTime
+  createAt: Time
 }

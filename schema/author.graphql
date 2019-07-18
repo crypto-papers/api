@@ -3,5 +3,5 @@ type Author {
   name: String!
   papers: [Paper]
   psuedonym: Boolean
-  # createAt: DateTime
+  createAt: Time
 }

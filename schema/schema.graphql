@@ -4,32 +4,53 @@ schema {
 }
 
 type Query {
-  author( id: ID! ): Author
-  currency( id: ID! ): Currency
-  file( id: ID! ): File
-  user( id: ID! ): User
-  paper( id: ID! ): Paper
+  author(id: ID!): Author
+  authors: [Author!]!
+  currency(id: ID!): Currency
+  currencies: [Currency!]!
+  file(id: ID!): File
+  files: [File!]!
+  user(id: ID!): User
+  users: [User!]!
+  paper(id: ID!): Paper
+  papers: [Paper!]!
 }
 
 type Mutation {
-  createAuthor( name: String! ): Author!
-  deleteAuthor( id: ID! ): Author!
-  updateAuthor( name: String!, psuedonym: Boolean ): Author!
+  createAuthor(name: String!): Author!
+  deleteAuthor(id: ID!): Author!
+  updateAuthor(name: String!, psuedonym: Boolean): Author!
 
-  createCurrency( name: String!, ticker: String! ): Currency!
-  deleteCurrency( id: ID! ): Currency!
-  updateCurrency( name: String!, ticker: String! ): Currency!
+  createCurrency(name: String!, ticker: String!): Currency!
+  deleteCurrency(id: ID!): Currency!
+  updateCurrency(name: String!, ticker: String!): Currency!
 
-  createFile( url: String! ): File!
-  deleteFile( id: ID! ): File!
-  updateFile( coverImage: String, source: String, url: String, version: Float ): File!
-  
-  createPaper( title: String!,description: String, excerpt: String, pageNum: Int ): Paper!
-  deletePaper( id: ID! ): Paper!
-  updatePaper( title: String, description: String, excerpt: String, pageNum: Int ): Paper!
+  createFile(url: String!): File!
+  deleteFile(id: ID!): File!
+  updateFile(
+    coverImage: String
+    source: String
+    url: String
+    version: Float
+  ): File!
 
-  createUser( name: String!, email: String!, password: String! ): User!
-  deleteUser( id: ID! ): User!
-  updateUser( name: String, email: String, password: String ): User!
+  createPaper(
+    title: String!
+    description: String
+    excerpt: String
+    pageNum: Int
+  ): Paper!
+  deletePaper(id: ID!): Paper!
+  updatePaper(
+    title: String
+    description: String
+    excerpt: String
+    pageNum: Int
+  ): Paper!
+
+  createUser(name: String!, email: String!, password: String!): User!
+  deleteUser(id: ID!): User!
+  updateUser(name: String, email: String, password: String): User!
 }
 
+scalar Time

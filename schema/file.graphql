@@ -1,9 +1,9 @@
 type File {
   id: ID!
   coverImage: String
-  # pubDate: DateTime
+  pubDate: Time
   source: String
   url: String!
   version: Float
-  # createAt: DateTime
+  createAt: Time
 }

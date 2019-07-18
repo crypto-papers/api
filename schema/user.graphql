@@ -3,5 +3,5 @@ type User {
   email: String!
   name: String!
   password: String!
-  # createAt: DateTime
+  createAt: Time
 }
