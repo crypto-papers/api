@@ -3,17 +3,29 @@ package server
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/99designs/gqlgen/handler"
-	"github.com/crypto-papers/api/generated"
-	"github.com/crypto-papers/api/resolver"
+	gen "github.com/crypto-papers/api/generated"
+	res "github.com/crypto-papers/api/resolver"
 )
 
-// StartServer initiates a web-server at port 3000
-func StartServer() {
-	http.Handle("/", handler.Playground("Cryptopapers", "/query"))
-	
-	http.Handle("/query", handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver.Resolver{}})))
+const defaultPort = "4000"
 
-	log.Fatal(http.ListenAndServe(":3000", nil))
+// StartServer initiates a web-server at port set in environment (4000 if no port provided)
+func StartServer() {
+	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		port = defaultPort
+	}
+
+	http.Handle("/", handler.Playground("Cryptopapers", "/query"))
+	http.Handle("/query", handler.GraphQL(gen.NewExecutableSchema(gen.Config{Resolvers: &res.Resolver{}})))
+
+	log.Printf("Server is running on http://localhost:%s", port)
+
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
