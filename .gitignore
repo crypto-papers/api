@@ -3,3 +3,6 @@ api
 
 # Dependencies
 node_modules/
+
+# Environmental Variables
+.env
