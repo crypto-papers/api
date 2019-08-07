@@ -2,6 +2,10 @@ package config
 
 import "os"
 
+type GQLConfig struct {
+	Port string
+}
+
 type PostgresConfig struct {
 	PGUser     string
 	PGPassword string
@@ -10,12 +14,16 @@ type PostgresConfig struct {
 }
 
 type Config struct {
+	GQL      GQLConfig
 	Postgres PostgresConfig
 }
 
 // New generates a new Config struct containing environmental variable
 func New() *Config {
 	return &Config{
+		GQL: GQLConfig{
+			Port: getEnv("GQL_PORT", "4000"),
+		},
 		Postgres: PostgresConfig{
 			PGUser:     getEnv("PG_USER", ""),
 			PGPassword: getEnv("PG_PASSWORD", ""),
