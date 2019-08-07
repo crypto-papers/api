@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -24,6 +25,22 @@ func StartServer() {
 	log.Printf("Server is running on http://localhost:%s", port)
 
 	err := http.ListenAndServe(":"+port, nil)
+	handleErr(err)
+}
+
+func connectDb() {
+	db, err := postgres.Connect()
+	handleErr(err)
+
+	initDB(db)
+}
+
+func initDB(db *sql.DB) {
+	postgres.ExecQuery(db, "CREATE TABLE public.papers (id SERIAL PRIMARY KEY, title varchar(255))")
+	postgres.ExecQuery(db, "INSERT INTO papers(title) VALUES('test')")
+}
+
+func handleErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
