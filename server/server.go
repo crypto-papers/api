@@ -1,7 +1,6 @@
 package server
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
@@ -32,12 +31,7 @@ func connectDb() {
 	db, err := postgres.Connect()
 	handleErr(err)
 
-	initDB(db)
-}
-
-func initDB(db *sql.DB) {
-	postgres.ExecQuery(db, "CREATE TABLE public.papers (id SERIAL PRIMARY KEY, title varchar(255))")
-	postgres.ExecQuery(db, "INSERT INTO papers(title) VALUES('test')")
+	postgres.CheckSchemaVersion(db)
 }
 
 func handleErr(err error) {

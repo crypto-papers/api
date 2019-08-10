@@ -23,18 +23,22 @@ type Mutation {
   createAuthor(data: CreateAuthorInput!): Author!
   deleteAuthor(id: ID!): Author!
   updateAuthor(data: UpdateAuthorInput!): Author!
+
   # Currency mutations
   createCurrency(data: CreateCurrencyInput!): Currency!
   deleteCurrency(id: ID!): Currency!
   updateCurrency(data: UpdateCurrencyInput!): Currency!
+
   # File mutations
   createFile(data: CreateFileInput!): File!
   deleteFile(id: ID!): File!
   updateFile(data: UpdateFileInput!): File!
+
   # Paper mutations
   createPaper(data: CreatePaperInput!): Paper!
   deletePaper(id: ID!): Paper!
   updatePaper(data: UpdatePaperInput!): Paper!
+
   # User mutations
   createUser(data: CreateUserInput!): User!
   deleteUser(id: ID!): User!
