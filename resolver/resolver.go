@@ -13,14 +13,10 @@ import (
 
 // Resolver creates collections of items
 type Resolver struct {
-	// authors    []*model.Author
-	currencies []*model.Currency
-	files      []*model.File
-	papers     []*model.Paper
-	users      []*model.User
-	db         *sql.DB
+	db *sql.DB
 }
 
+// NewRootResolvers applies the Config struct to the resolvers
 func NewRootResolvers(db *sql.DB) generated.Config {
 	c := generated.Config{
 		Resolvers: &Resolver{
@@ -188,8 +184,8 @@ type queryResolver struct{ *Resolver }
 func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
 	panic("not implemented")
 }
+
 func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
-	var author *model.Author
 	var authors []*model.Author
 
 	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
@@ -201,6 +197,7 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 	}
 
 	for rows.Next() {
+		var author = new(model.Author)
 		if err := rows.Scan(&author.ID, &author.Name, &author.Psuedonym, &author.CreateAt); err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
@@ -214,27 +211,107 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 func (r *queryResolver) Currency(ctx context.Context, id string) (*model.Currency, error) {
 	panic("not implemented")
 }
+
 func (r *queryResolver) Currencies(ctx context.Context) ([]*model.Currency, error) {
-	return r.currencies, nil
+	var currencies []*model.Currency
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, ticker, created_at FROM currencies")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		var currency = new(model.Currency)
+		if err := rows.Scan(&currency.ID, &currency.Name, &currency.Ticker, &currency.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+		currencies = append(currencies, currency)
+	}
+
+	return currencies, nil
 }
 
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
 	panic("not implemented")
 }
+
 func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
-	return r.files, nil
+	var files []*model.File
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, coverimage, source, url, created_at FROM files")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		var file = new(model.File)
+		if err := rows.Scan(&file.ID, &file.CoverImage, &file.Source, &file.URL, &file.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+		files = append(files, file)
+	}
+
+	return files, nil
 }
 
 func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, error) {
 	panic("not implemented")
 }
+
 func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
-	return r.papers, nil
+	var papers []*model.Paper
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, author, description, excerpt, page_num, title, created_at FROM papers")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		var paper = new(model.Paper)
+		if err := rows.Scan(&paper.ID, &paper.Author, &paper.Description, &paper.Excerpt, &paper.PageNum, &paper.Title, &paper.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+		papers = append(papers, paper)
+	}
+
+	return papers, nil
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	panic("not implemented")
 }
+
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	return r.users, nil
+	var users []*model.User
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, email, created_at FROM users")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		var user = new(model.User)
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }
