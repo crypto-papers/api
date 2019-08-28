@@ -2,21 +2,33 @@ package resolver
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
+	"github.com/crypto-papers/api/db"
+	"github.com/crypto-papers/api/errors"
 	"github.com/crypto-papers/api/generated"
 	"github.com/crypto-papers/api/model"
 )
 
-// THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
-
 // Resolver creates collections of items
 type Resolver struct {
-	authors    []*model.Author
+	// authors    []*model.Author
 	currencies []*model.Currency
 	files      []*model.File
 	papers     []*model.Paper
 	users      []*model.User
+	db         *sql.DB
+}
+
+func NewRootResolvers(db *sql.DB) generated.Config {
+	c := generated.Config{
+		Resolvers: &Resolver{
+			db: db,
+		},
+	}
+
+	return c
 }
 
 // Mutation executes GraphQL mutations

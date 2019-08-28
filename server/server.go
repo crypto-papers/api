@@ -16,22 +16,18 @@ func StartServer() {
 	conf := config.New()
 	port := conf.GQL.Port
 
-	connectDb()
+	db, dberr := postgres.Connect()
+	handleErr(dberr)
+
+	postgres.CheckSchemaVersion(db)
 
 	http.Handle("/", handler.Playground("Cryptopapers", "/query"))
-	http.Handle("/query", handler.GraphQL(gen.NewExecutableSchema(gen.Config{Resolvers: &res.Resolver{}})))
+	http.Handle("/query", handler.GraphQL(gen.NewExecutableSchema(res.NewRootResolvers(db))))
 
 	log.Printf("Server is running on http://localhost:%s", port)
 
 	err := http.ListenAndServe(":"+port, nil)
 	handleErr(err)
-}
-
-func connectDb() {
-	db, err := postgres.Connect()
-	handleErr(err)
-
-	postgres.CheckSchemaVersion(db)
 }
 
 func handleErr(err error) {
