@@ -182,7 +182,24 @@ func (r *mutationResolver) UpdateUser(context.Context, model.UpdateUserInput) (*
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
-	panic("not implemented")
+	var author = new(model.Author)
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&author.ID, &author.Name, &author.Psuedonym, &author.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+	}
+
+	return author, nil
 }
 
 func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
@@ -209,7 +226,24 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 }
 
 func (r *queryResolver) Currency(ctx context.Context, id string) (*model.Currency, error) {
-	panic("not implemented")
+	var currency = new(model.Currency)
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, ticker, created_at FROM currencies")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&currency.ID, &currency.Name, &currency.Ticker, &currency.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+	}
+
+	return currency, nil
 }
 
 func (r *queryResolver) Currencies(ctx context.Context) ([]*model.Currency, error) {
@@ -236,7 +270,24 @@ func (r *queryResolver) Currencies(ctx context.Context) ([]*model.Currency, erro
 }
 
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
-	panic("not implemented")
+	var file = new(model.File)
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, coverimage, source, url, created_at FROM files")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&file.ID, &file.CoverImage, &file.Source, &file.URL, &file.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+	}
+
+	return file, nil
 }
 
 func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
@@ -263,13 +314,30 @@ func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
 }
 
 func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, error) {
-	panic("not implemented")
+	var paper = new(model.Paper)
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, excerpt, page_num, title, created_at FROM papers")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&paper.ID, &paper.Excerpt, &paper.PageNum, &paper.Title, &paper.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+	}
+
+	return paper, nil
 }
 
 func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 	var papers []*model.Paper
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, author, description, excerpt, page_num, title, created_at FROM papers")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, excerpt, page_num, title, created_at FROM papers")
 	defer rows.Close()
 
 	if err != nil {
@@ -279,7 +347,7 @@ func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 
 	for rows.Next() {
 		var paper = new(model.Paper)
-		if err := rows.Scan(&paper.ID, &paper.Author, &paper.Description, &paper.Excerpt, &paper.PageNum, &paper.Title, &paper.CreateAt); err != nil {
+		if err := rows.Scan(&paper.ID, &paper.Excerpt, &paper.PageNum, &paper.Title, &paper.CreateAt); err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -290,7 +358,24 @@ func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	panic("not implemented")
+	var user = new(model.User)
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, email, created_at FROM users")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+	}
+
+	return user, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
