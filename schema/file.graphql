@@ -1,6 +1,7 @@
 type File {
   id: ID!
   coverImage: String
+  latest: Boolean
   pubDate: Time
   source: String
   url: String!

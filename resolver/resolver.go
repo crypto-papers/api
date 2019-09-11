@@ -39,9 +39,39 @@ func (r *Resolver) Query() generated.QueryResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.CreateAuthorInput) (*model.Author, error) {
+func (r *mutationResolver) CreateAsset(ctx context.Context, data model.AssetCreateInput) (*model.Asset, error) {
+	asset := &model.Asset{
+		Name:     data.Name,
+		Ticker:   data.Ticker,
+		CreateAt: time.Now(),
+	}
+
+	rows, err := db.LogAndQuery(
+		r.db,
+		"INSERT INTO assets (name, ticker, created_at) VALUES ($1, $2, $3) RETURNING id",
+		data.Name, data.Ticker, asset.CreateAt,
+	)
+
+	if err != nil || !rows.Next() {
+		return asset, err
+	}
+
+	return asset, nil
+}
+
+func (r *mutationResolver) DeleteAsset(ctx context.Context, id string) (*model.Asset, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) UpdateAsset(context.Context, model.AssetUpdateInput) (*model.Asset, error) {
+	panic("not implemented")
+}
+
+func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCreateInput) (*model.Author, error) {
 	author := &model.Author{
-		Name:      data.Name,
+		Bio:  data.Bio,
+		Name: data.Name,
+		// Papers:    data.Papers,
+		Photo:     data.Photo,
 		Psuedonym: data.Psuedonym,
 		CreateAt:  time.Now(),
 	}
@@ -62,38 +92,11 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.CreateAu
 func (r *mutationResolver) DeleteAuthor(ctx context.Context, id string) (*model.Author, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdateAuthor(context.Context, model.UpdateAuthorInput) (*model.Author, error) {
+func (r *mutationResolver) UpdateAuthor(context.Context, model.AuthorUpdateInput) (*model.Author, error) {
 	panic("not implemented")
 }
 
-func (r *mutationResolver) CreateCurrency(ctx context.Context, data model.CreateCurrencyInput) (*model.Currency, error) {
-	currency := &model.Currency{
-		Name:     data.Name,
-		Ticker:   data.Ticker,
-		CreateAt: time.Now(),
-	}
-
-	rows, err := db.LogAndQuery(
-		r.db,
-		"INSERT INTO currencies (name, ticker, created_at) VALUES ($1, $2, $3) RETURNING id",
-		data.Name, data.Ticker, currency.CreateAt,
-	)
-
-	if err != nil || !rows.Next() {
-		return currency, err
-	}
-
-	return currency, nil
-}
-
-func (r *mutationResolver) DeleteCurrency(ctx context.Context, id string) (*model.Currency, error) {
-	panic("not implemented")
-}
-func (r *mutationResolver) UpdateCurrency(context.Context, model.UpdateCurrencyInput) (*model.Currency, error) {
-	panic("not implemented")
-}
-
-func (r *mutationResolver) CreateFile(ctx context.Context, data model.CreateFileInput) (*model.File, error) {
+func (r *mutationResolver) CreateFile(ctx context.Context, data model.FileCreateInput) (*model.File, error) {
 	file := &model.File{
 		CoverImage: data.CoverImage,
 		Source:     data.Source,
@@ -104,7 +107,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, data model.CreateFile
 
 	rows, err := db.LogAndQuery(
 		r.db,
-		"INSERT INTO files (coverimage, source, url, version, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		"INSERT INTO files (cover_image, latest, source, url, version, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		data.CoverImage, data.Source, data.URL, data.Version, file.CreateAt,
 	)
 
@@ -118,11 +121,11 @@ func (r *mutationResolver) CreateFile(ctx context.Context, data model.CreateFile
 func (r *mutationResolver) DeleteFile(ctx context.Context, id string) (*model.File, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdateFile(context.Context, model.UpdateFileInput) (*model.File, error) {
+func (r *mutationResolver) UpdateFile(context.Context, model.FileUpdateInput) (*model.File, error) {
 	panic("not implemented")
 }
 
-func (r *mutationResolver) CreatePaper(ctx context.Context, data model.CreatePaperInput) (*model.Paper, error) {
+func (r *mutationResolver) CreatePaper(ctx context.Context, data model.PaperCreateInput) (*model.Paper, error) {
 	paper := &model.Paper{
 		Title:       data.Title,
 		Description: data.Description,
@@ -147,11 +150,11 @@ func (r *mutationResolver) CreatePaper(ctx context.Context, data model.CreatePap
 func (r *mutationResolver) DeletePaper(ctx context.Context, id string) (*model.Paper, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdatePaper(context.Context, model.UpdatePaperInput) (*model.Paper, error) {
+func (r *mutationResolver) UpdatePaper(context.Context, model.PaperUpdateInput) (*model.Paper, error) {
 	panic("not implemented")
 }
 
-func (r *mutationResolver) CreateUser(ctx context.Context, data model.CreateUserInput) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, data model.UserCreateInput) (*model.User, error) {
 	user := &model.User{
 		Name:     data.Name,
 		Email:    data.Email,
@@ -175,7 +178,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, data model.CreateUser
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
 	panic("not implemented")
 }
-func (r *mutationResolver) UpdateUser(context.Context, model.UpdateUserInput) (*model.User, error) {
+func (r *mutationResolver) UpdateUser(context.Context, model.UserUpdateInput) (*model.User, error) {
 	panic("not implemented")
 }
 
@@ -225,10 +228,10 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 	return authors, nil
 }
 
-func (r *queryResolver) Currency(ctx context.Context, id string) (*model.Currency, error) {
-	var currency = new(model.Currency)
+func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, error) {
+	var asset = new(model.Asset)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, name, ticker, created_at FROM currencies")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, ticker, created_at FROM assets")
 	defer rows.Close()
 
 	if err != nil {
@@ -237,19 +240,19 @@ func (r *queryResolver) Currency(ctx context.Context, id string) (*model.Currenc
 	}
 
 	for rows.Next() {
-		if err := rows.Scan(&currency.ID, &currency.Name, &currency.Ticker, &currency.CreateAt); err != nil {
+		if err := rows.Scan(&asset.ID, &asset.Name, &asset.Ticker, &asset.CreateAt); err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
 	}
 
-	return currency, nil
+	return asset, nil
 }
 
-func (r *queryResolver) Currencies(ctx context.Context) ([]*model.Currency, error) {
-	var currencies []*model.Currency
+func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
+	var assets []*model.Asset
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, name, ticker, created_at FROM currencies")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, ticker, created_at FROM assets")
 	defer rows.Close()
 
 	if err != nil {
@@ -258,21 +261,21 @@ func (r *queryResolver) Currencies(ctx context.Context) ([]*model.Currency, erro
 	}
 
 	for rows.Next() {
-		var currency = new(model.Currency)
-		if err := rows.Scan(&currency.ID, &currency.Name, &currency.Ticker, &currency.CreateAt); err != nil {
+		var asset = new(model.Asset)
+		if err := rows.Scan(&asset.ID, &asset.Name, &asset.Ticker, &asset.CreateAt); err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
-		currencies = append(currencies, currency)
+		assets = append(assets, asset)
 	}
 
-	return currencies, nil
+	return assets, nil
 }
 
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
 	var file = new(model.File)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, coverimage, source, url, created_at FROM files")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, cover_image, latest, source, url, created_at FROM files")
 	defer rows.Close()
 
 	if err != nil {
@@ -293,7 +296,7 @@ func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error
 func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
 	var files []*model.File
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, coverimage, source, url, created_at FROM files")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, cover_image, latest, source, url, created_at FROM files")
 	defer rows.Close()
 
 	if err != nil {

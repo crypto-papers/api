@@ -1,11 +1,12 @@
 type Paper {
   id: ID!
   author: [Author]
-  currency: [Currency]
+  asset: [Asset]
   description: String
   excerpt: String
   file: [File]
   pageNum: Int
+  prettyId: Int
   title: String!
   createAt: Time!
 }

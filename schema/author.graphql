@@ -1,7 +1,9 @@
 type Author {
   id: ID!
+  bio: String
   name: String!
   papers: [Paper]
+  photo: String
   psuedonym: Boolean
   createAt: Time!
 }

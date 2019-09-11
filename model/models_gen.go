@@ -6,54 +6,61 @@ import (
 	"time"
 )
 
-type Author struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Papers    []*Paper  `json:"papers"`
-	Psuedonym *bool     `json:"psuedonym"`
-	CreateAt  time.Time `json:"createAt"`
-}
-
-type CreateAuthorInput struct {
-	Name      string `json:"name"`
-	Psuedonym *bool  `json:"psuedonym"`
-}
-
-type CreateCurrencyInput struct {
-	Name   string `json:"name"`
-	Ticker string `json:"ticker"`
-}
-
-type CreateFileInput struct {
-	CoverImage *string  `json:"coverImage"`
-	Source     *string  `json:"source"`
-	URL        string   `json:"url"`
-	Version    *float64 `json:"version"`
-}
-
-type CreatePaperInput struct {
-	Title       string  `json:"title"`
-	Description *string `json:"description"`
-	Excerpt     *string `json:"excerpt"`
-	PageNum     *int    `json:"pageNum"`
-}
-
-type CreateUserInput struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type Currency struct {
+type Asset struct {
 	ID       string    `json:"id"`
 	Name     string    `json:"name"`
 	Ticker   string    `json:"ticker"`
 	CreateAt time.Time `json:"createAt"`
 }
 
+type AssetCreateInput struct {
+	Name   string `json:"name"`
+	Ticker string `json:"ticker"`
+}
+
+type AssetUpdateInput struct {
+	Name   *string `json:"name"`
+	Ticker *string `json:"ticker"`
+}
+
+type Author struct {
+	ID        string    `json:"id"`
+	Bio       *string   `json:"bio"`
+	Name      string    `json:"name"`
+	Papers    []*Paper  `json:"papers"`
+	Photo     *string   `json:"photo"`
+	Psuedonym *bool     `json:"psuedonym"`
+	CreateAt  time.Time `json:"createAt"`
+}
+
+type AuthorCreateInput struct {
+	Bio       *string               `json:"bio"`
+	Name      string                `json:"name"`
+	Papers    *PaperCreateManyInput `json:"papers"`
+	Photo     *string               `json:"photo"`
+	Psuedonym *bool                 `json:"psuedonym"`
+}
+
+type AuthorCreateManyInput struct {
+	Create  []*AuthorCreateInput      `json:"create"`
+	Connect []*AuthorWhereUniqueInput `json:"connect"`
+}
+
+type AuthorUpdateInput struct {
+	Bio       *string `json:"bio"`
+	Name      *string `json:"name"`
+	Photo     *string `json:"photo"`
+	Psuedonym *bool   `json:"psuedonym"`
+}
+
+type AuthorWhereUniqueInput struct {
+	ID *string `json:"id"`
+}
+
 type File struct {
 	ID         string     `json:"id"`
 	CoverImage *string    `json:"coverImage"`
+	Latest     *bool      `json:"latest"`
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
 	URL        string     `json:"url"`
@@ -61,46 +68,61 @@ type File struct {
 	CreateAt   time.Time  `json:"createAt"`
 }
 
+type FileCreateInput struct {
+	CoverImage *string    `json:"coverImage"`
+	Latest     *bool      `json:"latest"`
+	PubDate    *time.Time `json:"pubDate"`
+	Source     *string    `json:"source"`
+	URL        string     `json:"url"`
+	Version    *float64   `json:"version"`
+}
+
+type FileUpdateInput struct {
+	CoverImage *string    `json:"coverImage"`
+	Latest     *bool      `json:"latest"`
+	PubDate    *time.Time `json:"pubDate"`
+	Source     *string    `json:"source"`
+	URL        *string    `json:"url"`
+	Version    *float64   `json:"version"`
+}
+
 type Paper struct {
-	ID          string      `json:"id"`
-	Author      []*Author   `json:"author"`
-	Currency    []*Currency `json:"currency"`
-	Description *string     `json:"description"`
-	Excerpt     *string     `json:"excerpt"`
-	File        []*File     `json:"file"`
-	PageNum     *int        `json:"pageNum"`
-	Title       string      `json:"title"`
-	CreateAt    time.Time   `json:"createAt"`
+	ID          string    `json:"id"`
+	Author      []*Author `json:"author"`
+	Asset       []*Asset  `json:"asset"`
+	Description *string   `json:"description"`
+	Excerpt     *string   `json:"excerpt"`
+	File        []*File   `json:"file"`
+	PageNum     *int      `json:"pageNum"`
+	PrettyID    *int      `json:"prettyId"`
+	Title       string    `json:"title"`
+	CreateAt    time.Time `json:"createAt"`
 }
 
-type UpdateAuthorInput struct {
-	Name      *string `json:"name"`
-	Psuedonym *bool   `json:"psuedonym"`
+type PaperCreateInput struct {
+	Author      []*AuthorCreateManyInput `json:"author"`
+	Description *string                  `json:"description"`
+	Excerpt     *string                  `json:"excerpt"`
+	PageNum     *int                     `json:"pageNum"`
+	PrettyID    *int                     `json:"prettyId"`
+	Title       string                   `json:"title"`
 }
 
-type UpdateCurrencyInput struct {
-	Name   *string `json:"name"`
-	Ticker *string `json:"ticker"`
+type PaperCreateManyInput struct {
+	Create  []*PaperCreateInput      `json:"create"`
+	Connect []*PaperWhereUniqueInput `json:"connect"`
 }
 
-type UpdateFileInput struct {
-	CoverImage *string  `json:"coverImage"`
-	Source     *string  `json:"source"`
-	URL        *string  `json:"url"`
-	Version    *float64 `json:"version"`
-}
-
-type UpdatePaperInput struct {
-	Title       *string `json:"title"`
+type PaperUpdateInput struct {
 	Description *string `json:"description"`
 	Excerpt     *string `json:"excerpt"`
 	PageNum     *int    `json:"pageNum"`
+	PrettyID    *int    `json:"prettyId"`
+	Title       *string `json:"title"`
 }
 
-type UpdateUserInput struct {
-	Name     *string `json:"name"`
-	Email    *string `json:"email"`
-	Password *string `json:"password"`
+type PaperWhereUniqueInput struct {
+	ID *string `json:"id"`
 }
 
 type User struct {
@@ -109,4 +131,16 @@ type User struct {
 	Name     string    `json:"name"`
 	Password string    `json:"password"`
 	CreateAt time.Time `json:"createAt"`
+}
+
+type UserCreateInput struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UserUpdateInput struct {
+	Name     *string `json:"name"`
+	Email    *string `json:"email"`
+	Password *string `json:"password"`
 }
