@@ -1,60 +1,120 @@
-# Inputs for mutations
-input CreateAuthorInput {
-  name: String!
-  psuedonym: Boolean
-}
-
-input UpdateAuthorInput {
-  name: String
-  psuedonym: Boolean
-}
-
-input CreateCurrencyInput {
+# Inputs for asset mutations
+input AssetCreateInput {
   name: String!
   ticker: String!
 }
 
-input UpdateCurrencyInput {
+input AssetCreateManyInput {
+  create: [AssetCreateInput!]
+  connect: [AssetWhereUniqueInput!]
+}
+
+input AssetUpdateInput {
   name: String
   ticker: String
 }
 
-input CreateFileInput {
+input AssetWhereUniqueInput {
+  id: ID
+}
+
+# Inputs for author mutations
+input AuthorCreateInput {
+  bio: String
+  name: String!
+  papers: PaperCreateManyInput
+  photo: String
+  psuedonym: Boolean
+}
+
+input AuthorCreateManyInput {
+  create: [AuthorCreateInput!]
+  connect: [AuthorWhereUniqueInput!]
+}
+
+input AuthorUpdateInput {
+  bio: String
+  name: String
+  # papers: [Paper]
+  photo: String
+  psuedonym: Boolean
+}
+
+input AuthorWhereUniqueInput {
+  id: ID
+}
+
+# Inputs for file mutations
+input FileCreateInput {
   coverImage: String
+  latest: Boolean
+  pubDate: Time
   source: String
   url: String!
   version: Float
 }
 
-input UpdateFileInput {
+input FileCreateManyInput {
+  create: [FileCreateInput!]
+  connect: [FileWhereUniqueInput!]
+}
+
+input FileUpdateInput {
   coverImage: String
+  latest: Boolean
+  pubDate: Time
   source: String
   url: String
   version: Float
 }
 
-input CreatePaperInput {
+input FileWhereUniqueInput {
+  id: ID
+}
+
+# Inputs for paper mutations
+input PaperCreateInput {
+  author: [AuthorCreateManyInput]
+  asset: [AssetCreateManyInput]
+  description: String
+  excerpt: String
+  file: [FileCreateManyInput]
+  pageNum: Int
   title: String!
-  description: String
-  excerpt: String
-  pageNum: Int
 }
 
-input UpdatePaperInput {
+input PaperCreateManyInput {
+  create: [PaperCreateInput!]
+  connect: [PaperWhereUniqueInput!]
+}
+
+input PaperUpdateInput {
+  # author: [Author]
+  # asset: [Asset]
+  description: String
+  excerpt: String
+  # file: [File]
+  pageNum: Int
   title: String
-  description: String
-  excerpt: String
-  pageNum: Int
 }
 
-input CreateUserInput {
+input PaperWhereUniqueInput {
+  id: ID
+}
+
+# Inputs for user mutations
+input UserCreateInput {
   name: String!
   email: String!
   password: String!
 }
 
-input UpdateUserInput {
+input UserUpdateInput {
   name: String
   email: String
   password: String
+}
+
+input UserWhereUniqueInput {
+  id: ID
 }
