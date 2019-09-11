@@ -18,9 +18,18 @@ type AssetCreateInput struct {
 	Ticker string `json:"ticker"`
 }
 
+type AssetCreateManyInput struct {
+	Create  []*AssetCreateInput      `json:"create"`
+	Connect []*AssetWhereUniqueInput `json:"connect"`
+}
+
 type AssetUpdateInput struct {
 	Name   *string `json:"name"`
 	Ticker *string `json:"ticker"`
+}
+
+type AssetWhereUniqueInput struct {
+	ID *string `json:"id"`
 }
 
 type Author struct {
@@ -77,6 +86,11 @@ type FileCreateInput struct {
 	Version    *float64   `json:"version"`
 }
 
+type FileCreateManyInput struct {
+	Create  []*FileCreateInput      `json:"create"`
+	Connect []*FileWhereUniqueInput `json:"connect"`
+}
+
 type FileUpdateInput struct {
 	CoverImage *string    `json:"coverImage"`
 	Latest     *bool      `json:"latest"`
@@ -84,6 +98,10 @@ type FileUpdateInput struct {
 	Source     *string    `json:"source"`
 	URL        *string    `json:"url"`
 	Version    *float64   `json:"version"`
+}
+
+type FileWhereUniqueInput struct {
+	ID *string `json:"id"`
 }
 
 type Paper struct {
@@ -101,10 +119,11 @@ type Paper struct {
 
 type PaperCreateInput struct {
 	Author      []*AuthorCreateManyInput `json:"author"`
+	Asset       []*AssetCreateManyInput  `json:"asset"`
 	Description *string                  `json:"description"`
 	Excerpt     *string                  `json:"excerpt"`
+	File        []*FileCreateManyInput   `json:"file"`
 	PageNum     *int                     `json:"pageNum"`
-	PrettyID    *int                     `json:"prettyId"`
 	Title       string                   `json:"title"`
 }
 
@@ -117,7 +136,6 @@ type PaperUpdateInput struct {
 	Description *string `json:"description"`
 	Excerpt     *string `json:"excerpt"`
 	PageNum     *int    `json:"pageNum"`
-	PrettyID    *int    `json:"prettyId"`
 	Title       *string `json:"title"`
 }
 
@@ -143,4 +161,8 @@ type UserUpdateInput struct {
 	Name     *string `json:"name"`
 	Email    *string `json:"email"`
 	Password *string `json:"password"`
+}
+
+type UserWhereUniqueInput struct {
+	ID *string `json:"id"`
 }

@@ -37,8 +37,10 @@ func (r *Resolver) Query() generated.QueryResolver {
 	return &queryResolver{r}
 }
 
+// Mutation resolvers
 type mutationResolver struct{ *Resolver }
 
+// Asset mutation resolvers
 func (r *mutationResolver) CreateAsset(ctx context.Context, data model.AssetCreateInput) (*model.Asset, error) {
 	asset := &model.Asset{
 		Name:     data.Name,
@@ -59,13 +61,25 @@ func (r *mutationResolver) CreateAsset(ctx context.Context, data model.AssetCrea
 	return asset, nil
 }
 
-func (r *mutationResolver) DeleteAsset(ctx context.Context, id string) (*model.Asset, error) {
-	panic("not implemented")
+func (r *mutationResolver) DeleteAsset(ctx context.Context, id model.AssetWhereUniqueInput) (*model.Asset, error) {
+	rows, err := db.LogAndQuery(
+		r.db,
+		"DELETE FROM assets WHERE id = $1",
+		id.ID,
+	)
+
+	if err != nil || !rows.Next() {
+		return nil, err
+	}
+
+	return nil, nil
 }
+
 func (r *mutationResolver) UpdateAsset(context.Context, model.AssetUpdateInput) (*model.Asset, error) {
 	panic("not implemented")
 }
 
+// Author mutation resolvers
 func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCreateInput) (*model.Author, error) {
 	author := &model.Author{
 		Bio:  data.Bio,
@@ -89,13 +103,25 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 	return author, nil
 }
 
-func (r *mutationResolver) DeleteAuthor(ctx context.Context, id string) (*model.Author, error) {
-	panic("not implemented")
+func (r *mutationResolver) DeleteAuthor(ctx context.Context, id model.AuthorWhereUniqueInput) (*model.Author, error) {
+	rows, err := db.LogAndQuery(
+		r.db,
+		"DELETE FROM autors WHERE id = $1",
+		id.ID,
+	)
+
+	if err != nil || !rows.Next() {
+		return nil, err
+	}
+
+	return nil, nil
 }
+
 func (r *mutationResolver) UpdateAuthor(context.Context, model.AuthorUpdateInput) (*model.Author, error) {
 	panic("not implemented")
 }
 
+// File mutation resolvers
 func (r *mutationResolver) CreateFile(ctx context.Context, data model.FileCreateInput) (*model.File, error) {
 	file := &model.File{
 		CoverImage: data.CoverImage,
@@ -118,13 +144,25 @@ func (r *mutationResolver) CreateFile(ctx context.Context, data model.FileCreate
 	return file, nil
 }
 
-func (r *mutationResolver) DeleteFile(ctx context.Context, id string) (*model.File, error) {
-	panic("not implemented")
+func (r *mutationResolver) DeleteFile(ctx context.Context, id model.FileWhereUniqueInput) (*model.File, error) {
+	rows, err := db.LogAndQuery(
+		r.db,
+		"DELETE FROM files WHERE id = $1",
+		id.ID,
+	)
+
+	if err != nil || !rows.Next() {
+		return nil, err
+	}
+
+	return nil, nil
 }
+
 func (r *mutationResolver) UpdateFile(context.Context, model.FileUpdateInput) (*model.File, error) {
 	panic("not implemented")
 }
 
+// Paper mutation resolvers
 func (r *mutationResolver) CreatePaper(ctx context.Context, data model.PaperCreateInput) (*model.Paper, error) {
 	paper := &model.Paper{
 		Title:       data.Title,
@@ -147,13 +185,25 @@ func (r *mutationResolver) CreatePaper(ctx context.Context, data model.PaperCrea
 	return paper, nil
 }
 
-func (r *mutationResolver) DeletePaper(ctx context.Context, id string) (*model.Paper, error) {
-	panic("not implemented")
+func (r *mutationResolver) DeletePaper(ctx context.Context, id model.PaperWhereUniqueInput) (*model.Paper, error) {
+	rows, err := db.LogAndQuery(
+		r.db,
+		"DELETE FROM papers WHERE id = $1",
+		id.ID,
+	)
+
+	if err != nil || !rows.Next() {
+		return nil, err
+	}
+
+	return nil, nil
 }
+
 func (r *mutationResolver) UpdatePaper(context.Context, model.PaperUpdateInput) (*model.Paper, error) {
 	panic("not implemented")
 }
 
+// User mutation resolvers
 func (r *mutationResolver) CreateUser(ctx context.Context, data model.UserCreateInput) (*model.User, error) {
 	user := &model.User{
 		Name:     data.Name,
@@ -175,59 +225,28 @@ func (r *mutationResolver) CreateUser(ctx context.Context, data model.UserCreate
 	return user, nil
 }
 
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
-	panic("not implemented")
+func (r *mutationResolver) DeleteUser(ctx context.Context, id model.UserWhereUniqueInput) (*model.User, error) {
+	rows, err := db.LogAndQuery(
+		r.db,
+		"DELETE FROM users WHERE id = $1",
+		id.ID,
+	)
+
+	if err != nil || !rows.Next() {
+		return nil, err
+	}
+
+	return nil, nil
 }
+
 func (r *mutationResolver) UpdateUser(context.Context, model.UserUpdateInput) (*model.User, error) {
 	panic("not implemented")
 }
 
+// Query resolvers
 type queryResolver struct{ *Resolver }
 
-func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
-	var author = new(model.Author)
-
-	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
-	defer rows.Close()
-
-	if err != nil {
-		errors.DebugError(err)
-		return nil, errors.InternalServerError
-	}
-
-	for rows.Next() {
-		if err := rows.Scan(&author.ID, &author.Name, &author.Psuedonym, &author.CreateAt); err != nil {
-			errors.DebugError(err)
-			return nil, errors.InternalServerError
-		}
-	}
-
-	return author, nil
-}
-
-func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
-	var authors []*model.Author
-
-	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
-	defer rows.Close()
-
-	if err != nil {
-		errors.DebugError(err)
-		return nil, errors.InternalServerError
-	}
-
-	for rows.Next() {
-		var author = new(model.Author)
-		if err := rows.Scan(&author.ID, &author.Name, &author.Psuedonym, &author.CreateAt); err != nil {
-			errors.DebugError(err)
-			return nil, errors.InternalServerError
-		}
-		authors = append(authors, author)
-	}
-
-	return authors, nil
-}
-
+// Asset query resolvers
 func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, error) {
 	var asset = new(model.Asset)
 
@@ -272,6 +291,52 @@ func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
 	return assets, nil
 }
 
+// Author query resolvers
+func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
+	var author = new(model.Author)
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&author.ID, &author.Name, &author.Psuedonym, &author.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+	}
+
+	return author, nil
+}
+
+func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
+	var authors []*model.Author
+
+	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
+	defer rows.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for rows.Next() {
+		var author = new(model.Author)
+		if err := rows.Scan(&author.ID, &author.Name, &author.Psuedonym, &author.CreateAt); err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+		authors = append(authors, author)
+	}
+
+	return authors, nil
+}
+
+// File query resolvers
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
 	var file = new(model.File)
 
@@ -316,6 +381,7 @@ func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
 	return files, nil
 }
 
+// Paper query resolvers
 func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, error) {
 	var paper = new(model.Paper)
 
@@ -360,6 +426,7 @@ func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 	return papers, nil
 }
 
+// User query resolvers
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	var user = new(model.User)
 
