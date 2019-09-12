@@ -1,5 +1,6 @@
 # Inputs for asset mutations
 input AssetCreateInput {
+  id: ID
   name: String!
   ticker: String!
 }
@@ -20,6 +21,7 @@ input AssetWhereUniqueInput {
 
 # Inputs for author mutations
 input AuthorCreateInput {
+  id: ID
   bio: String
   name: String!
   papers: PaperCreateManyInput
@@ -46,6 +48,7 @@ input AuthorWhereUniqueInput {
 
 # Inputs for file mutations
 input FileCreateInput {
+  id: ID
   coverImage: String
   latest: Boolean
   pubDate: Time
@@ -74,6 +77,7 @@ input FileWhereUniqueInput {
 
 # Inputs for paper mutations
 input PaperCreateInput {
+  id: ID
   author: [AuthorCreateManyInput]
   asset: [AssetCreateManyInput]
   description: String
@@ -104,6 +108,7 @@ input PaperWhereUniqueInput {
 
 # Inputs for user mutations
 input UserCreateInput {
+  id: ID
   name: String!
   email: String!
   password: String!
