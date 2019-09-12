@@ -38,9 +38,23 @@ func ExecQuery(db *sql.DB, query string, args ...interface{}) {
 	}
 }
 
+// LogAndQuery prints the query to the log output before running it
 func LogAndQuery(db *sql.DB, query string, args ...interface{}) (*sql.Rows, error) {
 	fmt.Println(query)
 	return db.Query(query, args...)
+}
+
+// LogQueryAndScan prints the query to the log output before running it and scanning for a returning id
+func LogQueryAndScan(db *sql.DB, query string, args ...interface{}) (string, error) {
+	fmt.Println(query)
+
+	var scan string
+	err := db.QueryRow(query, args...).Scan(&scan)
+	if err != nil {
+		panic(err)
+	}
+
+	return scan, nil
 }
 
 // CheckSchemaVersion compares the current database schema version to that specified in the environmental variables
