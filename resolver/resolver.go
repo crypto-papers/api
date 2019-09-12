@@ -82,22 +82,38 @@ func (r *mutationResolver) UpdateAsset(context.Context, model.AssetUpdateInput) 
 // Author mutation resolvers
 func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCreateInput) (*model.Author, error) {
 	author := &model.Author{
-		Bio:  data.Bio,
-		Name: data.Name,
-		// Papers:    data.Papers,
+		Bio:       data.Bio,
+		Name:      data.Name,
 		Photo:     data.Photo,
 		Psuedonym: data.Psuedonym,
 		CreateAt:  time.Now(),
 	}
 
-	rows, err := db.LogAndQuery(
+	authorID, err := db.LogQueryAndScan(
 		r.db,
-		"INSERT INTO authors (name, psuedonym, created_at) VALUES ($1, $2, $3) RETURNING id",
-		data.Name, data.Psuedonym, author.CreateAt,
+		"INSERT INTO authors (bio, author_name, photo, psuedonym, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		author.Bio, author.Name, author.Photo, author.Psuedonym, author.CreateAt,
 	)
 
-	if err != nil || !rows.Next() {
+	if err != nil {
 		return author, err
+	}
+
+	author.ID = authorID
+
+	papers := data.Papers.Connect
+	for _, paper := range papers {
+		paperID := paper.ID
+
+		rows, err := db.LogAndQuery(
+			r.db,
+			"INSERT INTO author_paper (author_id, paper_id) VALUES ($1, $2)",
+			authorID, paperID,
+		)
+
+		if err != nil || !rows.Next() {
+			return author, err
+		}
 	}
 
 	return author, nil
