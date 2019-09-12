@@ -2,7 +2,7 @@ type Author {
   id: ID!
   bio: String
   name: String!
-  papers: [Paper]
+  papers(where: PaperWhereInput): [Paper]
   photo: String
   psuedonym: Boolean
   createAt: Time!

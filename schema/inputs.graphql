@@ -15,6 +15,12 @@ input AssetUpdateInput {
   ticker: String
 }
 
+input AssetWhereInput {
+  id: ID
+  name: String
+  ticker: String
+}
+
 input AssetWhereUniqueInput {
   id: ID
 }
@@ -99,6 +105,11 @@ input PaperUpdateInput {
   excerpt: String
   # file: [File]
   pageNum: Int
+  title: String
+}
+
+input PaperWhereInput {
+  id: ID!
   title: String
 }
 

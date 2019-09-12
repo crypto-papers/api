@@ -1,10 +1,10 @@
 type Paper {
   id: ID!
-  author: [Author]
-  asset: [Asset]
+  author(where: AssetWhereUniqueInput): [Author]
+  asset(where: AuthorWhereUniqueInput): [Asset]
   description: String
   excerpt: String
-  file: [File]
+  file(where: FileWhereUniqueInput): [File]
   pageNum: Int
   prettyId: Int
   title: String!

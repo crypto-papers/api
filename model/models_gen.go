@@ -14,8 +14,9 @@ type Asset struct {
 }
 
 type AssetCreateInput struct {
-	Name   string `json:"name"`
-	Ticker string `json:"ticker"`
+	ID     *string `json:"id"`
+	Name   string  `json:"name"`
+	Ticker string  `json:"ticker"`
 }
 
 type AssetCreateManyInput struct {
@@ -24,6 +25,12 @@ type AssetCreateManyInput struct {
 }
 
 type AssetUpdateInput struct {
+	Name   *string `json:"name"`
+	Ticker *string `json:"ticker"`
+}
+
+type AssetWhereInput struct {
+	ID     *string `json:"id"`
 	Name   *string `json:"name"`
 	Ticker *string `json:"ticker"`
 }
@@ -43,6 +50,7 @@ type Author struct {
 }
 
 type AuthorCreateInput struct {
+	ID        *string               `json:"id"`
 	Bio       *string               `json:"bio"`
 	Name      string                `json:"name"`
 	Papers    *PaperCreateManyInput `json:"papers"`
@@ -78,6 +86,7 @@ type File struct {
 }
 
 type FileCreateInput struct {
+	ID         *string    `json:"id"`
 	CoverImage *string    `json:"coverImage"`
 	Latest     *bool      `json:"latest"`
 	PubDate    *time.Time `json:"pubDate"`
@@ -118,6 +127,7 @@ type Paper struct {
 }
 
 type PaperCreateInput struct {
+	ID          *string                  `json:"id"`
 	Author      []*AuthorCreateManyInput `json:"author"`
 	Asset       []*AssetCreateManyInput  `json:"asset"`
 	Description *string                  `json:"description"`
@@ -139,6 +149,11 @@ type PaperUpdateInput struct {
 	Title       *string `json:"title"`
 }
 
+type PaperWhereInput struct {
+	ID    string  `json:"id"`
+	Title *string `json:"title"`
+}
+
 type PaperWhereUniqueInput struct {
 	ID *string `json:"id"`
 }
@@ -152,9 +167,10 @@ type User struct {
 }
 
 type UserCreateInput struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	ID       *string `json:"id"`
+	Name     string  `json:"name"`
+	Email    string  `json:"email"`
+	Password string  `json:"password"`
 }
 
 type UserUpdateInput struct {
