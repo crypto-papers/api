@@ -51,7 +51,7 @@ func (r *mutationResolver) CreateAsset(ctx context.Context, data model.AssetCrea
 	rows, err := db.LogAndQuery(
 		r.db,
 		"INSERT INTO assets (name, ticker, created_at) VALUES ($1, $2, $3) RETURNING id",
-		data.Name, data.Ticker, asset.CreateAt,
+		asset.Name, asset.Ticker, asset.CreateAt,
 	)
 
 	if err != nil || !rows.Next() {
@@ -134,7 +134,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, data model.FileCreate
 	rows, err := db.LogAndQuery(
 		r.db,
 		"INSERT INTO files (cover_image, latest, source, url, version, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		data.CoverImage, data.Source, data.URL, data.Version, file.CreateAt,
+		file.CoverImage, file.Source, file.URL, file.Version, file.CreateAt,
 	)
 
 	if err != nil || !rows.Next() {
@@ -165,17 +165,17 @@ func (r *mutationResolver) UpdateFile(context.Context, model.FileUpdateInput) (*
 // Paper mutation resolvers
 func (r *mutationResolver) CreatePaper(ctx context.Context, data model.PaperCreateInput) (*model.Paper, error) {
 	paper := &model.Paper{
-		Title:       data.Title,
 		Description: data.Description,
 		Excerpt:     data.Excerpt,
 		PageNum:     data.PageNum,
+		Title:       data.Title,
 		CreateAt:    time.Now(),
 	}
 
 	rows, err := db.LogAndQuery(
 		r.db,
 		"INSERT INTO papers (title, description, excerpt, page_num, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		data.Title, data.Description, data.Excerpt, data.PageNum, paper.CreateAt,
+		paper.Title, paper.Description, paper.Excerpt, paper.PageNum, paper.CreateAt,
 	)
 
 	if err != nil || !rows.Next() {
@@ -215,7 +215,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, data model.UserCreate
 	rows, err := db.LogAndQuery(
 		r.db,
 		"INSERT INTO users (name, email, password, created_at) VALUES ($1, $2, $3, $4) RETURNING id",
-		data.Name, data.Email, data.Password, user.CreateAt,
+		user.Name, user.Email, user.Password, user.CreateAt,
 	)
 
 	if err != nil || !rows.Next() {
@@ -295,7 +295,7 @@ func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
 func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
 	var author = new(model.Author)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, author_name, psuedonym, created_at FROM authors")
 	defer rows.Close()
 
 	if err != nil {
@@ -316,7 +316,7 @@ func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, e
 func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 	var authors []*model.Author
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, name, psuedonym, created_at FROM authors")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, author_name, psuedonym, created_at FROM authors")
 	defer rows.Close()
 
 	if err != nil {
