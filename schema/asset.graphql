@@ -4,3 +4,30 @@ type Asset {
   ticker: String!
   createAt: Time!
 }
+
+# Inputs for asset mutations
+input AssetCreateInput {
+  id: ID
+  name: String!
+  ticker: String!
+}
+
+input AssetCreateManyInput {
+  create: [AssetCreateInput!]
+  connect: [AssetWhereUniqueInput!]
+}
+
+input AssetUpdateInput {
+  name: String
+  ticker: String
+}
+
+input AssetWhereInput {
+  id: ID
+  name: String
+  ticker: String
+}
+
+input AssetWhereUniqueInput {
+  id: ID
+}

@@ -8,3 +8,32 @@ type File {
   version: Float
   createAt: Time!
 }
+
+# Inputs for file mutations
+input FileCreateInput {
+  id: ID
+  coverImage: String
+  latest: Boolean
+  pubDate: Time
+  source: String
+  url: String!
+  version: Float
+}
+
+input FileCreateManyInput {
+  create: [FileCreateInput!]
+  connect: [FileWhereUniqueInput!]
+}
+
+input FileUpdateInput {
+  coverImage: String
+  latest: Boolean
+  pubDate: Time
+  source: String
+  url: String
+  version: Float
+}
+
+input FileWhereUniqueInput {
+  id: ID
+}

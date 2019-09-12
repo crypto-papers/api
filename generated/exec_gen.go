@@ -786,29 +786,8 @@ var parsedSchema = gqlparser.MustLoadSchema(
   ticker: String!
   createAt: Time!
 }
-`},
-	&ast.Source{Name: "schema/author.graphql", Input: `type Author {
-  id: ID!
-  bio: String
-  name: String!
-  papers(where: PaperWhereInput): [Paper]
-  photo: String
-  psuedonym: Boolean
-  createAt: Time!
-}
-`},
-	&ast.Source{Name: "schema/file.graphql", Input: `type File {
-  id: ID!
-  coverImage: String
-  latest: Boolean
-  pubDate: Time
-  source: String
-  url: String!
-  version: Float
-  createAt: Time!
-}
-`},
-	&ast.Source{Name: "schema/inputs.graphql", Input: `# Inputs for asset mutations
+
+# Inputs for asset mutations
 input AssetCreateInput {
   id: ID
   name: String!
@@ -833,6 +812,16 @@ input AssetWhereInput {
 
 input AssetWhereUniqueInput {
   id: ID
+}
+`},
+	&ast.Source{Name: "schema/author.graphql", Input: `type Author {
+  id: ID!
+  bio: String
+  name: String!
+  papers(where: PaperWhereInput): [Paper]
+  photo: String
+  psuedonym: Boolean
+  createAt: Time!
 }
 
 # Inputs for author mutations
@@ -860,6 +849,17 @@ input AuthorUpdateInput {
 
 input AuthorWhereUniqueInput {
   id: ID
+}
+`},
+	&ast.Source{Name: "schema/file.graphql", Input: `type File {
+  id: ID!
+  coverImage: String
+  latest: Boolean
+  pubDate: Time
+  source: String
+  url: String!
+  version: Float
+  createAt: Time!
 }
 
 # Inputs for file mutations
@@ -889,6 +889,19 @@ input FileUpdateInput {
 
 input FileWhereUniqueInput {
   id: ID
+}
+`},
+	&ast.Source{Name: "schema/paper.graphql", Input: `type Paper {
+  id: ID!
+  author(where: AssetWhereUniqueInput): [Author]
+  asset(where: AuthorWhereUniqueInput): [Asset]
+  description: String
+  excerpt: String
+  file(where: FileWhereUniqueInput): [File]
+  pageNum: Int
+  prettyId: Int
+  title: String!
+  createAt: Time!
 }
 
 # Inputs for paper mutations
@@ -925,37 +938,6 @@ input PaperWhereInput {
 
 input PaperWhereUniqueInput {
   id: ID
-}
-
-# Inputs for user mutations
-input UserCreateInput {
-  id: ID
-  name: String!
-  email: String!
-  password: String!
-}
-
-input UserUpdateInput {
-  name: String
-  email: String
-  password: String
-}
-
-input UserWhereUniqueInput {
-  id: ID
-}
-`},
-	&ast.Source{Name: "schema/paper.graphql", Input: `type Paper {
-  id: ID!
-  author(where: AssetWhereUniqueInput): [Author]
-  asset(where: AuthorWhereUniqueInput): [Asset]
-  description: String
-  excerpt: String
-  file(where: FileWhereUniqueInput): [File]
-  pageNum: Int
-  prettyId: Int
-  title: String!
-  createAt: Time!
 }
 `},
 	&ast.Source{Name: "schema/schema.graphql", Input: `schema {
@@ -1014,6 +996,24 @@ scalar Time
   name: String!
   password: String!
   createAt: Time!
+}
+
+# Inputs for user mutations
+input UserCreateInput {
+  id: ID
+  name: String!
+  email: String!
+  password: String!
+}
+
+input UserUpdateInput {
+  name: String
+  email: String
+  password: String
+}
+
+input UserWhereUniqueInput {
+  id: ID
 }
 `},
 )

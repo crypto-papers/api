@@ -7,3 +7,30 @@ type Author {
   psuedonym: Boolean
   createAt: Time!
 }
+
+# Inputs for author mutations
+input AuthorCreateInput {
+  id: ID
+  bio: String
+  name: String!
+  papers: PaperCreateManyInput
+  photo: String
+  psuedonym: Boolean
+}
+
+input AuthorCreateManyInput {
+  create: [AuthorCreateInput!]
+  connect: [AuthorWhereUniqueInput!]
+}
+
+input AuthorUpdateInput {
+  bio: String
+  name: String
+  # papers: [Paper]
+  photo: String
+  psuedonym: Boolean
+}
+
+input AuthorWhereUniqueInput {
+  id: ID
+}

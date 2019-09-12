@@ -5,3 +5,21 @@ type User {
   password: String!
   createAt: Time!
 }
+
+# Inputs for user mutations
+input UserCreateInput {
+  id: ID
+  name: String!
+  email: String!
+  password: String!
+}
+
+input UserUpdateInput {
+  name: String
+  email: String
+  password: String
+}
+
+input UserWhereUniqueInput {
+  id: ID
+}

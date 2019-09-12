@@ -10,3 +10,39 @@ type Paper {
   title: String!
   createAt: Time!
 }
+
+# Inputs for paper mutations
+input PaperCreateInput {
+  id: ID
+  author: [AuthorCreateManyInput]
+  asset: [AssetCreateManyInput]
+  description: String
+  excerpt: String
+  file: [FileCreateManyInput]
+  pageNum: Int
+  title: String!
+}
+
+input PaperCreateManyInput {
+  create: [PaperCreateInput!]
+  connect: [PaperWhereUniqueInput!]
+}
+
+input PaperUpdateInput {
+  # author: [Author]
+  # asset: [Asset]
+  description: String
+  excerpt: String
+  # file: [File]
+  pageNum: Int
+  title: String
+}
+
+input PaperWhereInput {
+  id: ID!
+  title: String
+}
+
+input PaperWhereUniqueInput {
+  id: ID
+}
