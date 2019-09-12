@@ -19,6 +19,8 @@ func schemaOne(db *sql.DB) {
 	ExecQuery(db, "CREATE TABLE IF NOT EXISTS public.files (id uuid DEFAULT uuid_generate_v4 (), cover_image VARCHAR(255), latest BOOL, pub_date TIMESTAMPTZ, source VARCHAR(255), url VARCHAR(255), version NUMERIC, created_at TIMESTAMPTZ, PRIMARY KEY (id));")
 	ExecQuery(db, "CREATE TABLE IF NOT EXISTS public.papers (id uuid DEFAULT uuid_generate_v4 (), author uuid [], asset uuid [], description TEXT, excerpt TEXT, file uuid [], page_num SMALLINT, pretty_id SERIAL, title VARCHAR(255), created_at TIMESTAMPTZ, PRIMARY KEY (id));")
 	ExecQuery(db, "CREATE TABLE IF NOT EXISTS public.users (id uuid DEFAULT uuid_generate_v4 (), name VARCHAR(255), email VARCHAR(255) NOT NULL UNIQUE, password TEXT NOT NULL, created_at TIMESTAMPTZ, PRIMARY KEY (id));")
+	// Create connection tables
+	ExecQuery(db, "CREATE TABLE IF NOT EXISTS public.author_paper (author_id uuid REFERENCES authors (id) ON UPDATE CASCADE, paper_id uuid REFERENCES papers (id) ON UPDATE CASCADE, CONSTRAINT author_paper_pkey PRIMARY KEY (author_id, paper_id));")
 
 	// Insert default values
 	ExecQuery(db, fmt.Sprintf("SET timezone = '%s';", conf.Base.Timezone))
