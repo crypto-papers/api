@@ -32,7 +32,7 @@ func StartServer() {
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
-		Debug:            true,
+		// Debug:            true,
 	}).Handler)
 
 	router.Handle("/", handler.Playground("Cryptopapers", "/query"))
