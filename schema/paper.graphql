@@ -4,8 +4,7 @@ type Paper {
   asset(where: AuthorWhereUniqueInput): [Asset]
   description: String
   excerpt: String
-  file(where: FileWhereUniqueInput): [File]
-  pageNum: Int
+  latestVersion: ID
   prettyId: Int
   title: String!
   createAt: Time!
@@ -18,8 +17,8 @@ input PaperCreateInput {
   asset: [AssetCreateManyInput]
   description: String
   excerpt: String
-  file: [FileCreateManyInput]
-  pageNum: Int
+  latestVersion: ID
+  prettyId: Int
   title: String!
 }
 
@@ -33,13 +32,13 @@ input PaperUpdateInput {
   # asset: [Asset]
   description: String
   excerpt: String
-  # file: [File]
-  pageNum: Int
+  latestVersion: ID
   title: String
 }
 
 input PaperWhereInput {
-  id: ID!
+  id: ID
+  prettyId: Int
   title: String
 }
 

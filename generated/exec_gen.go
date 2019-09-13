@@ -66,6 +66,7 @@ type ComplexityRoot struct {
 		CreateAt   func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Latest     func(childComplexity int) int
+		PageNum    func(childComplexity int) int
 		PubDate    func(childComplexity int) int
 		Source     func(childComplexity int) int
 		URL        func(childComplexity int) int
@@ -91,29 +92,29 @@ type ComplexityRoot struct {
 	}
 
 	Paper struct {
-		Asset       func(childComplexity int, where *model.AuthorWhereUniqueInput) int
-		Author      func(childComplexity int, where *model.AssetWhereUniqueInput) int
-		CreateAt    func(childComplexity int) int
-		Description func(childComplexity int) int
-		Excerpt     func(childComplexity int) int
-		File        func(childComplexity int, where *model.FileWhereUniqueInput) int
-		ID          func(childComplexity int) int
-		PageNum     func(childComplexity int) int
-		PrettyID    func(childComplexity int) int
-		Title       func(childComplexity int) int
+		Asset         func(childComplexity int, where *model.AuthorWhereUniqueInput) int
+		Author        func(childComplexity int, where *model.AssetWhereUniqueInput) int
+		CreateAt      func(childComplexity int) int
+		Description   func(childComplexity int) int
+		Excerpt       func(childComplexity int) int
+		ID            func(childComplexity int) int
+		LatestVersion func(childComplexity int) int
+		PrettyID      func(childComplexity int) int
+		Title         func(childComplexity int) int
 	}
 
 	Query struct {
-		Asset   func(childComplexity int, id string) int
-		Assets  func(childComplexity int) int
-		Author  func(childComplexity int, id string) int
-		Authors func(childComplexity int) int
-		File    func(childComplexity int, id string) int
-		Files   func(childComplexity int) int
-		Paper   func(childComplexity int, id string) int
-		Papers  func(childComplexity int) int
-		User    func(childComplexity int, id string) int
-		Users   func(childComplexity int) int
+		Asset      func(childComplexity int, id string) int
+		Assets     func(childComplexity int) int
+		Author     func(childComplexity int, id string) int
+		Authors    func(childComplexity int) int
+		File       func(childComplexity int, id string) int
+		Files      func(childComplexity int) int
+		Paper      func(childComplexity int, id string) int
+		PaperByPid func(childComplexity int, prettyID int) int
+		Papers     func(childComplexity int) int
+		User       func(childComplexity int, id string) int
+		Users      func(childComplexity int) int
 	}
 
 	User struct {
@@ -152,6 +153,7 @@ type QueryResolver interface {
 	User(ctx context.Context, id string) (*model.User, error)
 	Users(ctx context.Context) ([]*model.User, error)
 	Paper(ctx context.Context, id string) (*model.Paper, error)
+	PaperByPid(ctx context.Context, prettyID int) (*model.Paper, error)
 	Papers(ctx context.Context) ([]*model.Paper, error)
 }
 
@@ -279,6 +281,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.File.Latest(childComplexity), true
+
+	case "File.pageNum":
+		if e.complexity.File.PageNum == nil {
+			break
+		}
+
+		return e.complexity.File.PageNum(childComplexity), true
 
 	case "File.pubDate":
 		if e.complexity.File.PubDate == nil {
@@ -533,18 +542,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paper.Excerpt(childComplexity), true
 
-	case "Paper.file":
-		if e.complexity.Paper.File == nil {
-			break
-		}
-
-		args, err := ec.field_Paper_file_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Paper.File(childComplexity, args["where"].(*model.FileWhereUniqueInput)), true
-
 	case "Paper.id":
 		if e.complexity.Paper.ID == nil {
 			break
@@ -552,12 +549,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paper.ID(childComplexity), true
 
-	case "Paper.pageNum":
-		if e.complexity.Paper.PageNum == nil {
+	case "Paper.latestVersion":
+		if e.complexity.Paper.LatestVersion == nil {
 			break
 		}
 
-		return e.complexity.Paper.PageNum(childComplexity), true
+		return e.complexity.Paper.LatestVersion(childComplexity), true
 
 	case "Paper.prettyId":
 		if e.complexity.Paper.PrettyID == nil {
@@ -641,6 +638,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Paper(childComplexity, args["id"].(string)), true
+
+	case "Query.paperByPid":
+		if e.complexity.Query.PaperByPid == nil {
+			break
+		}
+
+		args, err := ec.field_Query_paperByPid_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PaperByPid(childComplexity, args["prettyId"].(int)), true
 
 	case "Query.papers":
 		if e.complexity.Query.Papers == nil {
@@ -855,6 +864,7 @@ input AuthorWhereUniqueInput {
   id: ID!
   coverImage: String
   latest: Boolean
+  pageNum: Int
   pubDate: Time
   source: String
   url: String!
@@ -867,6 +877,7 @@ input FileCreateInput {
   id: ID
   coverImage: String
   latest: Boolean
+  pageNum: Int
   pubDate: Time
   source: String
   url: String!
@@ -881,6 +892,7 @@ input FileCreateManyInput {
 input FileUpdateInput {
   coverImage: String
   latest: Boolean
+  pageNum: Int
   pubDate: Time
   source: String
   url: String
@@ -897,8 +909,7 @@ input FileWhereUniqueInput {
   asset(where: AuthorWhereUniqueInput): [Asset]
   description: String
   excerpt: String
-  file(where: FileWhereUniqueInput): [File]
-  pageNum: Int
+  latestVersion: ID
   prettyId: Int
   title: String!
   createAt: Time!
@@ -911,8 +922,8 @@ input PaperCreateInput {
   asset: [AssetCreateManyInput]
   description: String
   excerpt: String
-  file: [FileCreateManyInput]
-  pageNum: Int
+  latestVersion: ID
+  prettyId: Int
   title: String!
 }
 
@@ -926,13 +937,13 @@ input PaperUpdateInput {
   # asset: [Asset]
   description: String
   excerpt: String
-  # file: [File]
-  pageNum: Int
+  latestVersion: ID
   title: String
 }
 
 input PaperWhereInput {
-  id: ID!
+  id: ID
+  prettyId: Int
   title: String
 }
 
@@ -956,6 +967,7 @@ type Query {
   user(id: ID!): User
   users: [User!]!
   paper(id: ID!): Paper
+  paperByPid(prettyId: Int!): Paper
   papers: [Paper!]!
 }
 
@@ -1274,20 +1286,6 @@ func (ec *executionContext) field_Paper_author_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Paper_file_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.FileWhereUniqueInput
-	if tmp, ok := rawArgs["where"]; ok {
-		arg0, err = ec.unmarshalOFileWhereUniqueInput2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileWhereUniqueInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["where"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1341,6 +1339,20 @@ func (ec *executionContext) field_Query_file_args(ctx context.Context, rawArgs m
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_paperByPid_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["prettyId"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["prettyId"] = arg0
 	return args, nil
 }
 
@@ -1769,6 +1781,30 @@ func (ec *executionContext) _File_latest(ctx context.Context, field graphql.Coll
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _File_pageNum(ctx context.Context, field graphql.CollectedField, obj *model.File) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "File",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageNum, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _File_pubDate(ctx context.Context, field graphql.CollectedField, obj *model.File) graphql.Marshaler {
@@ -2544,38 +2580,7 @@ func (ec *executionContext) _Paper_excerpt(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Paper_file(ctx context.Context, field graphql.CollectedField, obj *model.Paper) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object:   "Paper",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Paper_file_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	rctx.Args = args
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.File, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.File)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOFile2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Paper_pageNum(ctx context.Context, field graphql.CollectedField, obj *model.Paper) graphql.Marshaler {
+func (ec *executionContext) _Paper_latestVersion(ctx context.Context, field graphql.CollectedField, obj *model.Paper) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -2588,15 +2593,15 @@ func (ec *executionContext) _Paper_pageNum(ctx context.Context, field graphql.Co
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PageNum, nil
+		return obj.LatestVersion, nil
 	})
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Paper_prettyId(ctx context.Context, field graphql.CollectedField, obj *model.Paper) graphql.Marshaler {
@@ -2930,6 +2935,37 @@ func (ec *executionContext) _Query_paper(ctx context.Context, field graphql.Coll
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Paper(rctx, args["id"].(string))
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Paper)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOPaper2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐPaper(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_paperByPid(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_paperByPid_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PaperByPid(rctx, args["prettyId"].(int))
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -4264,6 +4300,12 @@ func (ec *executionContext) unmarshalInputFileCreateInput(ctx context.Context, v
 			if err != nil {
 				return it, err
 			}
+		case "pageNum":
+			var err error
+			it.PageNum, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "pubDate":
 			var err error
 			it.PubDate, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
@@ -4333,6 +4375,12 @@ func (ec *executionContext) unmarshalInputFileUpdateInput(ctx context.Context, v
 		case "latest":
 			var err error
 			it.Latest, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pageNum":
+			var err error
+			it.PageNum, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4420,15 +4468,15 @@ func (ec *executionContext) unmarshalInputPaperCreateInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "file":
+		case "latestVersion":
 			var err error
-			it.File, err = ec.unmarshalOFileCreateManyInput2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileCreateManyInput(ctx, v)
+			it.LatestVersion, err = ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "pageNum":
+		case "prettyId":
 			var err error
-			it.PageNum, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.PrettyID, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4486,9 +4534,9 @@ func (ec *executionContext) unmarshalInputPaperUpdateInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "pageNum":
+		case "latestVersion":
 			var err error
-			it.PageNum, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.LatestVersion, err = ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4512,7 +4560,13 @@ func (ec *executionContext) unmarshalInputPaperWhereInput(ctx context.Context, v
 		switch k {
 		case "id":
 			var err error
-			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "prettyId":
+			var err error
+			it.PrettyID, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4745,6 +4799,8 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._File_coverImage(ctx, field, obj)
 		case "latest":
 			out.Values[i] = ec._File_latest(ctx, field, obj)
+		case "pageNum":
+			out.Values[i] = ec._File_pageNum(ctx, field, obj)
 		case "pubDate":
 			out.Values[i] = ec._File_pubDate(ctx, field, obj)
 		case "source":
@@ -4897,10 +4953,8 @@ func (ec *executionContext) _Paper(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Paper_description(ctx, field, obj)
 		case "excerpt":
 			out.Values[i] = ec._Paper_excerpt(ctx, field, obj)
-		case "file":
-			out.Values[i] = ec._Paper_file(ctx, field, obj)
-		case "pageNum":
-			out.Values[i] = ec._Paper_pageNum(ctx, field, obj)
+		case "latestVersion":
+			out.Values[i] = ec._Paper_latestVersion(ctx, field, obj)
 		case "prettyId":
 			out.Values[i] = ec._Paper_prettyId(ctx, field, obj)
 		case "title":
@@ -5048,6 +5102,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_paper(ctx, field)
+				return res
+			})
+		case "paperByPid":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_paperByPid(ctx, field)
 				return res
 			})
 		case "papers":
@@ -5628,6 +5693,20 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -6329,46 +6408,6 @@ func (ec *executionContext) marshalOFile2githubᚗcomᚋcryptoᚑpapersᚋapiᚋ
 	return ec._File(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOFile2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v []*model.File) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		rctx := &graphql.ResolverContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOFile2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalOFile2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v *model.File) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -6396,42 +6435,6 @@ func (ec *executionContext) unmarshalOFileCreateInput2ᚕᚖgithubᚗcomᚋcrypt
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOFileCreateManyInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileCreateManyInput(ctx context.Context, v interface{}) (model.FileCreateManyInput, error) {
-	return ec.unmarshalInputFileCreateManyInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalOFileCreateManyInput2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileCreateManyInput(ctx context.Context, v interface{}) ([]*model.FileCreateManyInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.FileCreateManyInput, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalOFileCreateManyInput2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileCreateManyInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalOFileCreateManyInput2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileCreateManyInput(ctx context.Context, v interface{}) (*model.FileCreateManyInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOFileCreateManyInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileCreateManyInput(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) unmarshalOFileWhereUniqueInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileWhereUniqueInput(ctx context.Context, v interface{}) (model.FileWhereUniqueInput, error) {
-	return ec.unmarshalInputFileWhereUniqueInput(ctx, v)
-}
-
 func (ec *executionContext) unmarshalOFileWhereUniqueInput2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileWhereUniqueInput(ctx context.Context, v interface{}) ([]*model.FileWhereUniqueInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -6450,14 +6453,6 @@ func (ec *executionContext) unmarshalOFileWhereUniqueInput2ᚕᚖgithubᚗcomᚋ
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) unmarshalOFileWhereUniqueInput2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileWhereUniqueInput(ctx context.Context, v interface{}) (*model.FileWhereUniqueInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOFileWhereUniqueInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFileWhereUniqueInput(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalOFloat2float64(ctx context.Context, v interface{}) (float64, error) {

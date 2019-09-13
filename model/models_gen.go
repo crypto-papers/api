@@ -78,6 +78,7 @@ type File struct {
 	ID         string     `json:"id"`
 	CoverImage *string    `json:"coverImage"`
 	Latest     *bool      `json:"latest"`
+	PageNum    *int       `json:"pageNum"`
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
 	URL        string     `json:"url"`
@@ -89,6 +90,7 @@ type FileCreateInput struct {
 	ID         *string    `json:"id"`
 	CoverImage *string    `json:"coverImage"`
 	Latest     *bool      `json:"latest"`
+	PageNum    *int       `json:"pageNum"`
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
 	URL        string     `json:"url"`
@@ -103,6 +105,7 @@ type FileCreateManyInput struct {
 type FileUpdateInput struct {
 	CoverImage *string    `json:"coverImage"`
 	Latest     *bool      `json:"latest"`
+	PageNum    *int       `json:"pageNum"`
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
 	URL        *string    `json:"url"`
@@ -114,27 +117,26 @@ type FileWhereUniqueInput struct {
 }
 
 type Paper struct {
-	ID          string    `json:"id"`
-	Author      []*Author `json:"author"`
-	Asset       []*Asset  `json:"asset"`
-	Description *string   `json:"description"`
-	Excerpt     *string   `json:"excerpt"`
-	File        []*File   `json:"file"`
-	PageNum     *int      `json:"pageNum"`
-	PrettyID    *int      `json:"prettyId"`
-	Title       string    `json:"title"`
-	CreateAt    time.Time `json:"createAt"`
+	ID            string    `json:"id"`
+	Author        []*Author `json:"author"`
+	Asset         []*Asset  `json:"asset"`
+	Description   *string   `json:"description"`
+	Excerpt       *string   `json:"excerpt"`
+	LatestVersion *string   `json:"latestVersion"`
+	PrettyID      *int      `json:"prettyId"`
+	Title         string    `json:"title"`
+	CreateAt      time.Time `json:"createAt"`
 }
 
 type PaperCreateInput struct {
-	ID          *string                  `json:"id"`
-	Author      []*AuthorCreateManyInput `json:"author"`
-	Asset       []*AssetCreateManyInput  `json:"asset"`
-	Description *string                  `json:"description"`
-	Excerpt     *string                  `json:"excerpt"`
-	File        []*FileCreateManyInput   `json:"file"`
-	PageNum     *int                     `json:"pageNum"`
-	Title       string                   `json:"title"`
+	ID            *string                  `json:"id"`
+	Author        []*AuthorCreateManyInput `json:"author"`
+	Asset         []*AssetCreateManyInput  `json:"asset"`
+	Description   *string                  `json:"description"`
+	Excerpt       *string                  `json:"excerpt"`
+	LatestVersion *string                  `json:"latestVersion"`
+	PrettyID      *int                     `json:"prettyId"`
+	Title         string                   `json:"title"`
 }
 
 type PaperCreateManyInput struct {
@@ -143,15 +145,16 @@ type PaperCreateManyInput struct {
 }
 
 type PaperUpdateInput struct {
-	Description *string `json:"description"`
-	Excerpt     *string `json:"excerpt"`
-	PageNum     *int    `json:"pageNum"`
-	Title       *string `json:"title"`
+	Description   *string `json:"description"`
+	Excerpt       *string `json:"excerpt"`
+	LatestVersion *string `json:"latestVersion"`
+	Title         *string `json:"title"`
 }
 
 type PaperWhereInput struct {
-	ID    string  `json:"id"`
-	Title *string `json:"title"`
+	ID       *string `json:"id"`
+	PrettyID *int    `json:"prettyId"`
+	Title    *string `json:"title"`
 }
 
 type PaperWhereUniqueInput struct {

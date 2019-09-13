@@ -2,6 +2,7 @@ type File {
   id: ID!
   coverImage: String
   latest: Boolean
+  pageNum: Int
   pubDate: Time
   source: String
   url: String!
@@ -14,6 +15,7 @@ input FileCreateInput {
   id: ID
   coverImage: String
   latest: Boolean
+  pageNum: Int
   pubDate: Time
   source: String
   url: String!
@@ -28,6 +30,7 @@ input FileCreateManyInput {
 input FileUpdateInput {
   coverImage: String
   latest: Boolean
+  pageNum: Int
   pubDate: Time
   source: String
   url: String
