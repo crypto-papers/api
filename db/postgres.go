@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/crypto-papers/api/config"
@@ -40,7 +41,8 @@ func ExecQuery(db *sql.DB, query string, args ...interface{}) {
 
 // LogAndQuery prints the query to the log output before running it
 func LogAndQuery(db *sql.DB, query string, args ...interface{}) (*sql.Rows, error) {
-	fmt.Println(query)
+	s := stripWhiteSpace(query)
+	fmt.Println(s)
 	return db.Query(query, args...)
 }
 
@@ -64,11 +66,11 @@ func CheckSchemaVersion(db *sql.DB) {
 	exists.Scan(&regclass)
 
 	if regclass == "internal.config" {
-		var config_value string
+		var schemaVersion string
 		row := db.QueryRow("SELECT config_value FROM internal.config WHERE config_name = 'schema_version';")
-		row.Scan(&config_value)
+		row.Scan(&schemaVersion)
 
-		if config_value == conf.Postgres.PGSchema {
+		if schemaVersion == conf.Postgres.PGSchema {
 			fmt.Println("Database up to date.")
 		} else {
 			fmt.Println("Updating database...")
@@ -86,4 +88,10 @@ func InitDB(db *sql.DB) {
 	case "1.0":
 		schemaOne(db)
 	}
+}
+
+func stripWhiteSpace(s string) string {
+	s = strings.Replace(s, "\n", " ", -1)
+	s = strings.Replace(s, "\t", "", -1)
+	return s
 }
