@@ -268,16 +268,27 @@ type queryResolver struct{ *Resolver }
 func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, error) {
 	var asset = new(model.Asset)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, asset_name, ticker, created_at FROM assets")
-	defer rows.Close()
+	sql := `
+		SELECT
+			id,
+			asset_name,
+			ticker,
+			created_at
+		FROM assets
+		WHERE id = $1
+		LIMIT 1;
+	`
+
+	row, err := db.LogAndQuery(r.db, sql, id)
+	defer row.Close()
 
 	if err != nil {
 		errors.DebugError(err)
 		return nil, errors.InternalServerError
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(&asset.ID, &asset.Name, &asset.Ticker, &asset.CreateAt); err != nil {
+	for row.Next() {
+		if err := row.Scan(&asset.ID, &asset.Name, &asset.Ticker, &asset.CreateAt); err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -313,16 +324,37 @@ func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
 func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
 	var author = new(model.Author)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, author_name, bio, photo, psuedonym, created_at FROM authors")
-	defer rows.Close()
+	sql := `
+		SELECT
+			id,
+			author_name,
+			bio,
+			photo,
+			psuedonym,
+			created_at
+		FROM authors
+		WHERE id = $1
+		LIMIT 1
+	`
+
+	row, err := db.LogAndQuery(r.db, sql, id)
+	defer row.Close()
 
 	if err != nil {
 		errors.DebugError(err)
 		return nil, errors.InternalServerError
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(&author.ID, &author.Name, &author.Bio, &author.Photo, &author.Psuedonym, &author.CreateAt); err != nil {
+	for row.Next() {
+		err := row.Scan(
+			&author.ID,
+			&author.Name,
+			&author.Bio,
+			&author.Photo,
+			&author.Psuedonym,
+			&author.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -358,16 +390,43 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
 	var file = new(model.File)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, cover_image, is_latest, page_num, pub_date, source, url, version, created_at FROM files")
-	defer rows.Close()
+	sql := `
+		SELECT
+			id,
+			cover_image,
+			is_latest,
+			page_num,
+			pub_date,
+			source,
+			url,
+			version,
+			created_at
+		FROM files
+		WHERE id = $1
+		LIMIT 1;
+	`
+
+	row, err := db.LogAndQuery(r.db, sql, id)
+	defer row.Close()
 
 	if err != nil {
 		errors.DebugError(err)
 		return nil, errors.InternalServerError
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(&file.ID, &file.CoverImage, &file.Latest, &file.PageNum, &file.PubDate, &file.Source, &file.URL, &file.Version, &file.CreateAt); err != nil {
+	for row.Next() {
+		err := row.Scan(
+			&file.ID,
+			&file.CoverImage,
+			&file.Latest,
+			&file.PageNum,
+			&file.PubDate,
+			&file.Source,
+			&file.URL,
+			&file.Version,
+			&file.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -403,16 +462,36 @@ func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
 func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, error) {
 	var paper = new(model.Paper)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, description, excerpt, latest_version, pretty_id, title, created_at FROM papers")
-	defer rows.Close()
-
+	sql := `
+		SELECT
+			id,
+			description,
+			excerpt,
+			latest_version,
+			pretty_id,
+			title,
+			created_at 
+		FROM papers
+		WHERE id = $1
+		LIMIT 1;
+	`
+	row, err := db.LogAndQuery(r.db, sql, id)
+	defer row.Close()
 	if err != nil {
 		errors.DebugError(err)
-		return nil, errors.InternalServerError
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(&paper.ID, &paper.Description, &paper.Excerpt, &paper.LatestVersion, &paper.PrettyID, &paper.Title, &paper.CreateAt); err != nil {
+	for row.Next() {
+		err = row.Scan(
+			&paper.ID,
+			&paper.Description,
+			&paper.Excerpt,
+			&paper.LatestVersion,
+			&paper.PrettyID,
+			&paper.Title,
+			&paper.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -424,16 +503,38 @@ func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, err
 func (r *queryResolver) PaperByPid(ctx context.Context, prettyID int) (*model.Paper, error) {
 	var paper = new(model.Paper)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, description, excerpt, latest_version, pretty_id, title, created_at FROM papers")
-	defer rows.Close()
+	sql := `
+		SELECT
+			id,
+			description,
+			excerpt,
+			latest_version,
+			pretty_id,
+			title,
+			created_at
+		FROM papers
+		WHERE pretty_id = $1
+		LIMIT 1;
+	`
+	row, err := db.LogAndQuery(r.db, sql, prettyID)
+	defer row.Close()
 
 	if err != nil {
 		errors.DebugError(err)
 		return nil, errors.InternalServerError
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(&paper.ID, &paper.Description, &paper.Excerpt, &paper.LatestVersion, &paper.PrettyID, &paper.Title, &paper.CreateAt); err != nil {
+	for row.Next() {
+		err = row.Scan(
+			&paper.ID,
+			&paper.Description,
+			&paper.Excerpt,
+			&paper.LatestVersion,
+			&paper.PrettyID,
+			&paper.Title,
+			&paper.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -469,16 +570,33 @@ func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	var user = new(model.User)
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, user_name, email, created_at FROM users")
-	defer rows.Close()
+	sql := `
+		SELECT
+			id,
+			user_name,
+			email,
+			created_at
+		FROM users
+		WHERE id = $1
+		LIMIT 1;
+	`
+
+	row, err := db.LogAndQuery(r.db, sql, id)
+	defer row.Close()
 
 	if err != nil {
 		errors.DebugError(err)
 		return nil, errors.InternalServerError
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.CreateAt); err != nil {
+	for row.Next() {
+		err := row.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Email,
+			&user.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
