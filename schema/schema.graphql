@@ -22,27 +22,27 @@ type Query {
 type Mutation {
   # Asset mutations
   createAsset(data: AssetCreateInput!): Asset!
-  deleteAsset(where: AssetWhereUniqueInput!): Asset!
+  deleteAsset(where: AssetWhereUniqueInput!): ID!
   updateAsset(data: AssetUpdateInput!): Asset!
 
   # Author mutations
   createAuthor(data: AuthorCreateInput!): Author!
-  deleteAuthor(where: AuthorWhereUniqueInput!): Author!
+  deleteAuthor(where: AuthorWhereUniqueInput!): ID!
   updateAuthor(data: AuthorUpdateInput!): Author!
 
   # File mutations
   createFile(data: FileCreateInput!): File!
-  deleteFile(where: FileWhereUniqueInput!): File!
+  deleteFile(where: FileWhereUniqueInput!): ID!
   updateFile(data: FileUpdateInput!): File!
 
   # Paper mutations
   createPaper(data: PaperCreateInput!): Paper!
-  deletePaper(where: PaperWhereUniqueInput!): Paper!
+  deletePaper(where: PaperWhereUniqueInput!): ID!
   updatePaper(data: PaperUpdateInput!): Paper!
 
   # User mutations
   createUser(data: UserCreateInput!): User!
-  deleteUser(where: UserWhereUniqueInput!): User!
+  deleteUser(where: UserWhereUniqueInput!): ID!
   updateUser(data: UserUpdateInput!): User!
 }
 

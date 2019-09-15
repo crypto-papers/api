@@ -1,11 +1,11 @@
 type File {
   id: ID!
   coverImage: String
+  filename: String!
   latest: Boolean
   pageNum: Int
   pubDate: Time
   source: String
-  url: String!
   version: String
   createAt: Time!
 }
@@ -14,11 +14,11 @@ type File {
 input FileCreateInput {
   id: ID
   coverImage: String
+  filename: String!
   latest: Boolean
   pageNum: Int
   pubDate: Time
   source: String
-  url: String!
   version: String
 }
 
@@ -29,14 +29,14 @@ input FileCreateManyInput {
 
 input FileUpdateInput {
   coverImage: String
+  filename: String
   latest: Boolean
   pageNum: Int
   pubDate: Time
   source: String
-  url: String
   version: String
 }
 
 input FileWhereUniqueInput {
-  id: ID
+  id: ID!
 }

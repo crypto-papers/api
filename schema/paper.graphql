@@ -39,5 +39,5 @@ input PaperWhereInput {
 }
 
 input PaperWhereUniqueInput {
-  id: ID
+  id: ID!
 }

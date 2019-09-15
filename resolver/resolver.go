@@ -43,36 +43,53 @@ type mutationResolver struct{ *Resolver }
 // Asset mutation resolvers
 func (r *mutationResolver) CreateAsset(ctx context.Context, data model.AssetCreateInput) (*model.Asset, error) {
 	asset := &model.Asset{
+		Logo:     data.Logo,
 		Name:     data.Name,
 		Ticker:   data.Ticker,
 		CreateAt: time.Now(),
 	}
 
-	rows, err := db.LogAndQuery(
+	sql := `
+		INSERT INTO assets (
+			asset_name,
+			logo,
+			ticker,
+			created_at
+		)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id;
+	`
+	assetID, err := db.LogQueryAndScan(
 		r.db,
-		"INSERT INTO assets (asset_name, ticker, created_at) VALUES ($1, $2, $3) RETURNING id",
-		asset.Name, asset.Ticker, asset.CreateAt,
+		sql,
+		asset.Name,
+		asset.Logo,
+		asset.Ticker,
+		asset.CreateAt,
 	)
-
-	if err != nil || !rows.Next() {
-		return asset, err
+	if err != nil {
+		return nil, err
 	}
+
+	asset.ID = assetID
 
 	return asset, nil
 }
 
-func (r *mutationResolver) DeleteAsset(ctx context.Context, id model.AssetWhereUniqueInput) (*model.Asset, error) {
-	rows, err := db.LogAndQuery(
+func (r *mutationResolver) DeleteAsset(ctx context.Context, id model.AssetWhereUniqueInput) (string, error) {
+	i := id.ID
+
+	_, err := db.LogAndQuery(
 		r.db,
 		"DELETE FROM assets WHERE id = $1",
-		id.ID,
+		i,
 	)
 
-	if err != nil || !rows.Next() {
-		return nil, err
+	if err != nil {
+		return i, err
 	}
 
-	return nil, nil
+	return i, nil
 }
 
 func (r *mutationResolver) UpdateAsset(context.Context, model.AssetUpdateInput) (*model.Asset, error) {
@@ -89,14 +106,29 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 		CreateAt:  time.Now(),
 	}
 
+	authorSQL := `
+		INSERT INTO authors (
+			author_name,
+			bio,
+			photo,
+			psuedonym,
+			created_at
+		)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id;
+	`
+
 	authorID, err := db.LogQueryAndScan(
 		r.db,
-		"INSERT INTO authors (bio, author_name, photo, psuedonym, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		author.Bio, author.Name, author.Photo, author.Psuedonym, author.CreateAt,
+		authorSQL,
+		author.Bio,
+		author.Name,
+		author.Photo,
+		author.Psuedonym,
+		author.CreateAt,
 	)
-
 	if err != nil {
-		return author, err
+		return nil, err
 	}
 
 	author.ID = authorID
@@ -105,13 +137,14 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 	for _, paper := range papers {
 		paperID := paper.ID
 
-		rows, err := db.LogAndQuery(
+		row, err := db.LogAndQuery(
 			r.db,
 			"INSERT INTO author_paper (author_id, paper_id) VALUES ($1, $2)",
-			authorID, paperID,
+			authorID,
+			paperID,
 		)
 
-		if err != nil || !rows.Next() {
+		if err != nil || !row.Next() {
 			return author, err
 		}
 	}
@@ -119,18 +152,20 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 	return author, nil
 }
 
-func (r *mutationResolver) DeleteAuthor(ctx context.Context, id model.AuthorWhereUniqueInput) (*model.Author, error) {
-	rows, err := db.LogAndQuery(
+func (r *mutationResolver) DeleteAuthor(ctx context.Context, id model.AuthorWhereUniqueInput) (string, error) {
+	i := id.ID
+
+	_, err := db.LogAndQuery(
 		r.db,
 		"DELETE FROM authors WHERE id = $1",
-		id.ID,
+		i,
 	)
 
-	if err != nil || !rows.Next() {
-		return nil, err
+	if err != nil {
+		return i, err
 	}
 
-	return nil, nil
+	return i, nil
 }
 
 func (r *mutationResolver) UpdateAuthor(context.Context, model.AuthorUpdateInput) (*model.Author, error) {
@@ -141,39 +176,63 @@ func (r *mutationResolver) UpdateAuthor(context.Context, model.AuthorUpdateInput
 func (r *mutationResolver) CreateFile(ctx context.Context, data model.FileCreateInput) (*model.File, error) {
 	file := &model.File{
 		CoverImage: data.CoverImage,
+		Filename:   data.Filename,
 		Latest:     data.Latest,
 		PageNum:    data.PageNum,
 		Source:     data.Source,
-		URL:        data.URL,
 		Version:    data.Version,
 		CreateAt:   time.Now(),
 	}
 
-	rows, err := db.LogAndQuery(
+	sql := `
+		INSERT INTO files (
+			cover_image,
+			filename,
+			is_latest,
+			page_num,
+			source,
+			version,
+			created_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id;
+	`
+
+	fileID, err := db.LogQueryAndScan(
 		r.db,
-		"INSERT INTO files (cover_image, is_latest, page_num, source, url, version, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-		file.CoverImage, file.Latest, file.PageNum, file.Source, file.URL, file.Version, file.CreateAt,
+		sql,
+		file.CoverImage,
+		file.Filename,
+		file.Latest,
+		file.PageNum,
+		file.Source,
+		file.Version,
+		file.CreateAt,
 	)
 
-	if err != nil || !rows.Next() {
-		return file, err
+	if err != nil {
+		return nil, err
 	}
+
+	file.ID = fileID
 
 	return file, nil
 }
 
-func (r *mutationResolver) DeleteFile(ctx context.Context, id model.FileWhereUniqueInput) (*model.File, error) {
-	rows, err := db.LogAndQuery(
+func (r *mutationResolver) DeleteFile(ctx context.Context, id model.FileWhereUniqueInput) (string, error) {
+	i := id.ID
+
+	_, err := db.LogAndQuery(
 		r.db,
 		"DELETE FROM files WHERE id = $1",
-		id.ID,
+		i,
 	)
 
-	if err != nil || !rows.Next() {
-		return nil, err
+	if err != nil {
+		return i, err
 	}
 
-	return nil, nil
+	return i, nil
 }
 
 func (r *mutationResolver) UpdateFile(context.Context, model.FileUpdateInput) (*model.File, error) {
@@ -191,31 +250,53 @@ func (r *mutationResolver) CreatePaper(ctx context.Context, data model.PaperCrea
 		CreateAt:      time.Now(),
 	}
 
-	rows, err := db.LogAndQuery(
+	sql := `
+		INSERT INTO papers (
+			description,
+			excerpt,
+			latest_version,
+			title_primary,
+			title_secondary,
+			created_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id;
+	`
+
+	paperID, err := db.LogQueryAndScan(
 		r.db,
-		"INSERT INTO papers (description, excerpt, latest_version, title_primary, title_secondary, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-		paper.Description, paper.Excerpt, paper.LatestVersion, paper.Title, paper.SubTitle, paper.CreateAt,
+		sql,
+		paper.Description,
+		paper.Excerpt,
+		paper.LatestVersion,
+		paper.Title,
+		paper.SubTitle,
+		paper.CreateAt,
 	)
 
-	if err != nil || !rows.Next() {
-		return paper, err
+	if err != nil {
+		return nil, err
 	}
+
+	paper.ID = paperID
 
 	return paper, nil
 }
 
-func (r *mutationResolver) DeletePaper(ctx context.Context, id model.PaperWhereUniqueInput) (*model.Paper, error) {
-	rows, err := db.LogAndQuery(
+func (r *mutationResolver) DeletePaper(ctx context.Context, id model.PaperWhereUniqueInput) (string, error) {
+	i := id.ID
+
+	_, err := db.LogAndQuery(
 		r.db,
 		"DELETE FROM papers WHERE id = $1",
-		id.ID,
+		i,
 	)
 
-	if err != nil || !rows.Next() {
-		return nil, err
+	if err != nil {
+		return i, err
 	}
 
-	return nil, nil
+	return i, nil
 }
 
 func (r *mutationResolver) UpdatePaper(context.Context, model.PaperUpdateInput) (*model.Paper, error) {
@@ -231,31 +312,47 @@ func (r *mutationResolver) CreateUser(ctx context.Context, data model.UserCreate
 		CreateAt: time.Now(),
 	}
 
-	rows, err := db.LogAndQuery(
+	sql := `
+		INSERT INTO users (
+			user_name,
+			email,
+			password,
+			created_at
+		)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id;
+	`
+	userID, err := db.LogQueryAndScan(
 		r.db,
-		"INSERT INTO users (user_name, email, password, created_at) VALUES ($1, $2, $3, $4) RETURNING id",
-		user.Name, user.Email, user.Password, user.CreateAt,
+		sql,
+		user.Name,
+		user.Email,
+		user.Password,
+		user.CreateAt,
 	)
-
-	if err != nil || !rows.Next() {
-		return user, err
+	if err != nil {
+		return nil, err
 	}
+
+	user.ID = userID
 
 	return user, nil
 }
 
-func (r *mutationResolver) DeleteUser(ctx context.Context, id model.UserWhereUniqueInput) (*model.User, error) {
-	rows, err := db.LogAndQuery(
+func (r *mutationResolver) DeleteUser(ctx context.Context, id model.UserWhereUniqueInput) (string, error) {
+	i := id.ID
+
+	_, err := db.LogAndQuery(
 		r.db,
 		"DELETE FROM users WHERE id = $1",
-		id.ID,
+		i,
 	)
 
-	if err != nil || !rows.Next() {
-		return nil, err
+	if err != nil {
+		return i, err
 	}
 
-	return nil, nil
+	return i, nil
 }
 
 func (r *mutationResolver) UpdateUser(context.Context, model.UserUpdateInput) (*model.User, error) {
@@ -273,6 +370,7 @@ func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, err
 		SELECT
 			id,
 			asset_name,
+			logo,
 			ticker,
 			created_at
 		FROM assets
@@ -289,7 +387,14 @@ func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, err
 	}
 
 	for row.Next() {
-		if err := row.Scan(&asset.ID, &asset.Name, &asset.Ticker, &asset.CreateAt); err != nil {
+		err := row.Scan(
+			&asset.ID,
+			&asset.Name,
+			&asset.Logo,
+			&asset.Ticker,
+			&asset.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -301,7 +406,17 @@ func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, err
 func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
 	var assets []*model.Asset
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, asset_name, ticker, created_at FROM assets")
+	sql := `
+		SELECT
+			id,
+			asset_name,
+			logo,
+			ticker,
+			created_at
+		FROM assets;
+	`
+
+	rows, err := db.LogAndQuery(r.db, sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -311,7 +426,14 @@ func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
 
 	for rows.Next() {
 		var asset = new(model.Asset)
-		if err := rows.Scan(&asset.ID, &asset.Name, &asset.Ticker, &asset.CreateAt); err != nil {
+		err := rows.Scan(
+			&asset.ID,
+			&asset.Name,
+			&asset.Logo,
+			&asset.Ticker,
+			&asset.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -335,7 +457,7 @@ func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, e
 			created_at
 		FROM authors
 		WHERE id = $1
-		LIMIT 1
+		LIMIT 1;
 	`
 
 	row, err := db.LogAndQuery(r.db, sql, id)
@@ -367,7 +489,18 @@ func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, e
 func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 	var authors []*model.Author
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, author_name, bio, photo, psuedonym, created_at FROM authors")
+	sql := `
+		SELECT
+			id,
+			author_name,
+			bio,
+			photo,
+			psuedonym,
+			created_at
+		FROM authors;
+	`
+
+	rows, err := db.LogAndQuery(r.db, sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -377,7 +510,15 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 
 	for rows.Next() {
 		var author = new(model.Author)
-		if err := rows.Scan(&author.ID, &author.Name, &author.Bio, &author.Photo, &author.Psuedonym, &author.CreateAt); err != nil {
+		err := rows.Scan(
+			&author.ID,
+			&author.Name,
+			&author.Bio,
+			&author.Photo,
+			&author.Psuedonym,
+			&author.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -395,11 +536,11 @@ func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error
 		SELECT
 			id,
 			cover_image,
+			filename,
 			is_latest,
 			page_num,
 			pub_date,
 			source,
-			url,
 			version,
 			created_at
 		FROM files
@@ -419,11 +560,11 @@ func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error
 		err := row.Scan(
 			&file.ID,
 			&file.CoverImage,
+			&file.Filename,
 			&file.Latest,
 			&file.PageNum,
 			&file.PubDate,
 			&file.Source,
-			&file.URL,
 			&file.Version,
 			&file.CreateAt,
 		)
@@ -439,7 +580,21 @@ func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error
 func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
 	var files []*model.File
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, cover_image, is_latest, page_num, pub_date, source, url, version, created_at FROM files")
+	sql := `
+		SELECT
+			id,
+			cover_image,
+			filename,
+			is_latest,
+			page_num,
+			pub_date,
+			source,
+			version,
+			created_at
+		FROM files;
+	`
+
+	rows, err := db.LogAndQuery(r.db, sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -449,7 +604,18 @@ func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
 
 	for rows.Next() {
 		var file = new(model.File)
-		if err := rows.Scan(&file.ID, &file.CoverImage, &file.Latest, &file.PageNum, &file.PubDate, &file.Source, &file.URL, &file.Version, &file.CreateAt); err != nil {
+		err := rows.Scan(
+			&file.ID,
+			&file.CoverImage,
+			&file.Filename,
+			&file.Latest,
+			&file.PageNum,
+			&file.PubDate,
+			&file.Source,
+			&file.Version,
+			&file.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -477,8 +643,10 @@ func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, err
 		WHERE id = $1
 		LIMIT 1;
 	`
+
 	row, err := db.LogAndQuery(r.db, sql, id)
 	defer row.Close()
+
 	if err != nil {
 		errors.DebugError(err)
 	}
@@ -520,6 +688,7 @@ func (r *queryResolver) PaperByPid(ctx context.Context, prettyID int) (*model.Pa
 		WHERE pretty_id = $1
 		LIMIT 1;
 	`
+
 	row, err := db.LogAndQuery(r.db, sql, prettyID)
 	defer row.Close()
 
@@ -551,7 +720,20 @@ func (r *queryResolver) PaperByPid(ctx context.Context, prettyID int) (*model.Pa
 func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 	var papers []*model.Paper
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, description, excerpt, latest_version, pretty_id, title_primary, title_secondary, created_at FROM papers")
+	sql := `
+		SELECT
+			id,
+			description,
+			excerpt,
+			latest_version,
+			pretty_id,
+			title_primary,
+			title_secondary,
+			created_at
+		FROM papers;
+	`
+
+	rows, err := db.LogAndQuery(r.db, sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -561,7 +743,17 @@ func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 
 	for rows.Next() {
 		var paper = new(model.Paper)
-		if err := rows.Scan(&paper.ID, &paper.Description, &paper.Excerpt, &paper.LatestVersion, &paper.PrettyID, &paper.Title, &paper.SubTitle, &paper.CreateAt); err != nil {
+		err := rows.Scan(
+			&paper.ID,
+			&paper.Description,
+			&paper.Excerpt,
+			&paper.LatestVersion,
+			&paper.PrettyID,
+			&paper.Title,
+			&paper.SubTitle,
+			&paper.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}
@@ -613,7 +805,15 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var users []*model.User
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, user_name, email, created_at FROM users")
+	sql := `
+		SELECT
+			id,
+			user_name,
+			email,
+			created_at
+		FROM users;
+	`
+	rows, err := db.LogAndQuery(r.db, sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -623,7 +823,13 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 
 	for rows.Next() {
 		var user = new(model.User)
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.CreateAt); err != nil {
+		err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Email,
+			&user.CreateAt,
+		)
+		if err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}

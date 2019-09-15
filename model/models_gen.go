@@ -8,6 +8,7 @@ import (
 
 type Asset struct {
 	ID       string    `json:"id"`
+	Logo     *string   `json:"logo"`
 	Name     string    `json:"name"`
 	Ticker   string    `json:"ticker"`
 	CreateAt time.Time `json:"createAt"`
@@ -15,6 +16,7 @@ type Asset struct {
 
 type AssetCreateInput struct {
 	ID     *string `json:"id"`
+	Logo   *string `json:"logo"`
 	Name   string  `json:"name"`
 	Ticker string  `json:"ticker"`
 }
@@ -25,6 +27,7 @@ type AssetCreateManyInput struct {
 }
 
 type AssetUpdateInput struct {
+	Logo   *string `json:"logo"`
 	Name   *string `json:"name"`
 	Ticker *string `json:"ticker"`
 }
@@ -36,14 +39,13 @@ type AssetWhereInput struct {
 }
 
 type AssetWhereUniqueInput struct {
-	ID *string `json:"id"`
+	ID string `json:"id"`
 }
 
 type Author struct {
 	ID        string    `json:"id"`
 	Bio       *string   `json:"bio"`
 	Name      string    `json:"name"`
-	Papers    []*Paper  `json:"papers"`
 	Photo     *string   `json:"photo"`
 	Psuedonym *bool     `json:"psuedonym"`
 	CreateAt  time.Time `json:"createAt"`
@@ -71,17 +73,17 @@ type AuthorUpdateInput struct {
 }
 
 type AuthorWhereUniqueInput struct {
-	ID *string `json:"id"`
+	ID string `json:"id"`
 }
 
 type File struct {
 	ID         string     `json:"id"`
 	CoverImage *string    `json:"coverImage"`
+	Filename   string     `json:"filename"`
 	Latest     *bool      `json:"latest"`
 	PageNum    *int       `json:"pageNum"`
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
-	URL        string     `json:"url"`
 	Version    *string    `json:"version"`
 	CreateAt   time.Time  `json:"createAt"`
 }
@@ -89,11 +91,11 @@ type File struct {
 type FileCreateInput struct {
 	ID         *string    `json:"id"`
 	CoverImage *string    `json:"coverImage"`
+	Filename   string     `json:"filename"`
 	Latest     *bool      `json:"latest"`
 	PageNum    *int       `json:"pageNum"`
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
-	URL        string     `json:"url"`
 	Version    *string    `json:"version"`
 }
 
@@ -104,16 +106,16 @@ type FileCreateManyInput struct {
 
 type FileUpdateInput struct {
 	CoverImage *string    `json:"coverImage"`
+	Filename   *string    `json:"filename"`
 	Latest     *bool      `json:"latest"`
 	PageNum    *int       `json:"pageNum"`
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
-	URL        *string    `json:"url"`
 	Version    *string    `json:"version"`
 }
 
 type FileWhereUniqueInput struct {
-	ID *string `json:"id"`
+	ID string `json:"id"`
 }
 
 type Paper struct {
@@ -156,7 +158,7 @@ type PaperWhereInput struct {
 }
 
 type PaperWhereUniqueInput struct {
-	ID *string `json:"id"`
+	ID string `json:"id"`
 }
 
 type User struct {
@@ -181,5 +183,5 @@ type UserUpdateInput struct {
 }
 
 type UserWhereUniqueInput struct {
-	ID *string `json:"id"`
+	ID string `json:"id"`
 }

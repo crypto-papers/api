@@ -1,5 +1,6 @@
 type Asset {
   id: ID!
+  logo: String
   name: String!
   ticker: String!
   createAt: Time!
@@ -8,6 +9,7 @@ type Asset {
 # Inputs for asset mutations
 input AssetCreateInput {
   id: ID
+  logo: String
   name: String!
   ticker: String!
 }
@@ -18,6 +20,7 @@ input AssetCreateManyInput {
 }
 
 input AssetUpdateInput {
+  logo: String
   name: String
   ticker: String
 }
@@ -29,5 +32,5 @@ input AssetWhereInput {
 }
 
 input AssetWhereUniqueInput {
-  id: ID
+  id: ID!
 }

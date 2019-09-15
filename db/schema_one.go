@@ -30,8 +30,8 @@ var authorsQuery = `
 		id uuid DEFAULT uuid_generate_v4 (),
 		author_name VARCHAR(255),
 		bio TEXT,
-		photo VARCHAR(255)
-		psuedonym BOOL
+		photo VARCHAR(255),
+		psuedonym BOOL,
 		created_at TIMESTAMPTZ,
 		PRIMARY KEY (id)
 	);
@@ -41,11 +41,11 @@ var filesQuery = `
 	CREATE TABLE IF NOT EXISTS public.files (
 		id uuid DEFAULT uuid_generate_v4 (),
 		cover_image VARCHAR(255),
+		filename VARCHAR(255),
 		is_latest BOOL,
 		page_num SMALLINT,
 		pub_date TIMESTAMPTZ,
 		source VARCHAR(255),
-		url VARCHAR(255),
 		version VARCHAR(255),
 		created_at TIMESTAMPTZ,
 		PRIMARY KEY (id)

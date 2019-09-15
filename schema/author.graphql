@@ -2,7 +2,6 @@ type Author {
   id: ID!
   bio: String
   name: String!
-  papers(where: PaperWhereInput): [Paper]
   photo: String
   psuedonym: Boolean
   createAt: Time!
@@ -26,11 +25,10 @@ input AuthorCreateManyInput {
 input AuthorUpdateInput {
   bio: String
   name: String
-  # papers: [Paper]
   photo: String
   psuedonym: Boolean
 }
 
 input AuthorWhereUniqueInput {
-  id: ID
+  id: ID!
 }

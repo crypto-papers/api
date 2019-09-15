@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/crypto-papers/api/config"
+	// github.com/lib/pq required for postgres driver to work
 	_ "github.com/lib/pq"
 )
 
@@ -48,7 +49,8 @@ func LogAndQuery(db *sql.DB, query string, args ...interface{}) (*sql.Rows, erro
 
 // LogQueryAndScan prints the query to the log output before running it and scanning for a returning id
 func LogQueryAndScan(db *sql.DB, query string, args ...interface{}) (string, error) {
-	fmt.Println(query)
+	s := stripWhiteSpace(query)
+	fmt.Println(s)
 
 	var scan string
 	err := db.QueryRow(query, args...).Scan(&scan)
