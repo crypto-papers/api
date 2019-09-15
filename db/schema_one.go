@@ -46,7 +46,7 @@ var filesQuery = `
 		pub_date TIMESTAMPTZ,
 		source VARCHAR(255),
 		url VARCHAR(255),
-		version NUMERIC,
+		version VARCHAR(255),
 		created_at TIMESTAMPTZ,
 		PRIMARY KEY (id)
 	);

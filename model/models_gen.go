@@ -82,7 +82,7 @@ type File struct {
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
 	URL        string     `json:"url"`
-	Version    *float64   `json:"version"`
+	Version    *string    `json:"version"`
 	CreateAt   time.Time  `json:"createAt"`
 }
 
@@ -94,7 +94,7 @@ type FileCreateInput struct {
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
 	URL        string     `json:"url"`
-	Version    *float64   `json:"version"`
+	Version    *string    `json:"version"`
 }
 
 type FileCreateManyInput struct {
@@ -109,7 +109,7 @@ type FileUpdateInput struct {
 	PubDate    *time.Time `json:"pubDate"`
 	Source     *string    `json:"source"`
 	URL        *string    `json:"url"`
-	Version    *float64   `json:"version"`
+	Version    *string    `json:"version"`
 }
 
 type FileWhereUniqueInput struct {
@@ -118,25 +118,23 @@ type FileWhereUniqueInput struct {
 
 type Paper struct {
 	ID            string    `json:"id"`
-	Author        []*Author `json:"author"`
-	Asset         []*Asset  `json:"asset"`
 	Description   *string   `json:"description"`
 	Excerpt       *string   `json:"excerpt"`
 	LatestVersion *string   `json:"latestVersion"`
 	PrettyID      *int      `json:"prettyId"`
+	SubTitle      *string   `json:"subTitle"`
 	Title         string    `json:"title"`
 	CreateAt      time.Time `json:"createAt"`
 }
 
 type PaperCreateInput struct {
-	ID            *string                  `json:"id"`
-	Author        []*AuthorCreateManyInput `json:"author"`
-	Asset         []*AssetCreateManyInput  `json:"asset"`
-	Description   *string                  `json:"description"`
-	Excerpt       *string                  `json:"excerpt"`
-	LatestVersion *string                  `json:"latestVersion"`
-	PrettyID      *int                     `json:"prettyId"`
-	Title         string                   `json:"title"`
+	ID            *string `json:"id"`
+	Description   *string `json:"description"`
+	Excerpt       *string `json:"excerpt"`
+	LatestVersion *string `json:"latestVersion"`
+	PrettyID      *int    `json:"prettyId"`
+	SubTitle      *string `json:"subTitle"`
+	Title         string  `json:"title"`
 }
 
 type PaperCreateManyInput struct {

@@ -1,11 +1,10 @@
 type Paper {
   id: ID!
-  author(where: AssetWhereUniqueInput): [Author]
-  asset(where: AuthorWhereUniqueInput): [Asset]
   description: String
   excerpt: String
   latestVersion: ID
   prettyId: Int
+  subTitle: String
   title: String!
   createAt: Time!
 }
@@ -13,12 +12,11 @@ type Paper {
 # Inputs for paper mutations
 input PaperCreateInput {
   id: ID
-  author: [AuthorCreateManyInput]
-  asset: [AssetCreateManyInput]
   description: String
   excerpt: String
   latestVersion: ID
   prettyId: Int
+  subTitle: String
   title: String!
 }
 
@@ -28,8 +26,6 @@ input PaperCreateManyInput {
 }
 
 input PaperUpdateInput {
-  # author: [Author]
-  # asset: [Asset]
   description: String
   excerpt: String
   latestVersion: ID

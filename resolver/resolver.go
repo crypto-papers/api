@@ -187,13 +187,14 @@ func (r *mutationResolver) CreatePaper(ctx context.Context, data model.PaperCrea
 		Excerpt:       data.Excerpt,
 		LatestVersion: data.LatestVersion,
 		Title:         data.Title,
+		SubTitle:      data.SubTitle,
 		CreateAt:      time.Now(),
 	}
 
 	rows, err := db.LogAndQuery(
 		r.db,
-		"INSERT INTO papers (title, description, excerpt, latest_version, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		paper.Title, paper.Description, paper.Excerpt, paper.LatestVersion, paper.CreateAt,
+		"INSERT INTO papers (description, excerpt, latest_version, title_primary, title_secondary, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+		paper.Description, paper.Excerpt, paper.LatestVersion, paper.Title, paper.SubTitle, paper.CreateAt,
 	)
 
 	if err != nil || !rows.Next() {
@@ -469,7 +470,8 @@ func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, err
 			excerpt,
 			latest_version,
 			pretty_id,
-			title,
+			title_primary,
+			title_secondary,
 			created_at 
 		FROM papers
 		WHERE id = $1
@@ -489,6 +491,7 @@ func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, err
 			&paper.LatestVersion,
 			&paper.PrettyID,
 			&paper.Title,
+			&paper.SubTitle,
 			&paper.CreateAt,
 		)
 		if err != nil {
@@ -510,7 +513,8 @@ func (r *queryResolver) PaperByPid(ctx context.Context, prettyID int) (*model.Pa
 			excerpt,
 			latest_version,
 			pretty_id,
-			title,
+			title_primary,
+			title_secondary,
 			created_at
 		FROM papers
 		WHERE pretty_id = $1
@@ -532,6 +536,7 @@ func (r *queryResolver) PaperByPid(ctx context.Context, prettyID int) (*model.Pa
 			&paper.LatestVersion,
 			&paper.PrettyID,
 			&paper.Title,
+			&paper.SubTitle,
 			&paper.CreateAt,
 		)
 		if err != nil {
@@ -546,7 +551,7 @@ func (r *queryResolver) PaperByPid(ctx context.Context, prettyID int) (*model.Pa
 func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 	var papers []*model.Paper
 
-	rows, err := db.LogAndQuery(r.db, "SELECT id, description, excerpt, latest_version, pretty_id, title, created_at FROM papers")
+	rows, err := db.LogAndQuery(r.db, "SELECT id, description, excerpt, latest_version, pretty_id, title_primary, title_secondary, created_at FROM papers")
 	defer rows.Close()
 
 	if err != nil {
@@ -556,7 +561,7 @@ func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 
 	for rows.Next() {
 		var paper = new(model.Paper)
-		if err := rows.Scan(&paper.ID, &paper.Description, &paper.Excerpt, &paper.LatestVersion, &paper.PrettyID, &paper.Title, &paper.CreateAt); err != nil {
+		if err := rows.Scan(&paper.ID, &paper.Description, &paper.Excerpt, &paper.LatestVersion, &paper.PrettyID, &paper.Title, &paper.SubTitle, &paper.CreateAt); err != nil {
 			errors.DebugError(err)
 			return nil, errors.InternalServerError
 		}

@@ -6,7 +6,7 @@ type File {
   pubDate: Time
   source: String
   url: String!
-  version: Float
+  version: String
   createAt: Time!
 }
 
@@ -19,7 +19,7 @@ input FileCreateInput {
   pubDate: Time
   source: String
   url: String!
-  version: Float
+  version: String
 }
 
 input FileCreateManyInput {
@@ -34,7 +34,7 @@ input FileUpdateInput {
   pubDate: Time
   source: String
   url: String
-  version: Float
+  version: String
 }
 
 input FileWhereUniqueInput {
