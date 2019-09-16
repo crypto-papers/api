@@ -25,7 +25,7 @@ func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error
 			source,
 			version,
 			created_at
-		FROM files
+		FROM public.files
 		WHERE id = $1
 		LIMIT 1;
 	`
@@ -74,7 +74,7 @@ func (r *queryResolver) Files(ctx context.Context) ([]*model.File, error) {
 			source,
 			version,
 			created_at
-		FROM files;
+		FROM public.files;
 	`
 
 	rows, err := db.LogAndQuery(r.db, sql)

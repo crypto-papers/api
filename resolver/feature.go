@@ -21,7 +21,7 @@ func (r *queryResolver) Feature(ctx context.Context, id string) (*model.Feature,
 			promoted,
 			sponsor,
 			created_at
-		FROM public.feature
+		FROM public.features
 		WHERE id = $1
 		LIMIT 1;
 	`
@@ -62,7 +62,7 @@ func (r *queryResolver) Features(ctx context.Context) ([]*model.Feature, error) 
 			promoted,
 			sponsor,
 			created_at
-		FROM assets;
+		FROM public.features;
 	`
 
 	rows, err := db.LogAndQuery(r.db, sql)

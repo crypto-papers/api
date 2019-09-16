@@ -22,7 +22,7 @@ func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, e
 			photo,
 			psuedonym,
 			created_at
-		FROM authors
+		FROM public.authors
 		WHERE id = $1
 		LIMIT 1;
 	`
@@ -65,7 +65,7 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 			photo,
 			psuedonym,
 			created_at
-		FROM authors;
+		FROM public.authors;
 	`
 
 	rows, err := db.LogAndQuery(r.db, sql)

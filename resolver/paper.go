@@ -24,7 +24,7 @@ func (r *queryResolver) Paper(ctx context.Context, id string) (*model.Paper, err
 			title_primary,
 			title_secondary,
 			created_at 
-		FROM papers
+		FROM public.papers
 		WHERE id = $1
 		LIMIT 1;
 	`
@@ -70,7 +70,7 @@ func (r *queryResolver) PaperByPid(ctx context.Context, prettyID int) (*model.Pa
 			title_primary,
 			title_secondary,
 			created_at
-		FROM papers
+		FROM public.papers
 		WHERE pretty_id = $1
 		LIMIT 1;
 	`
@@ -117,7 +117,7 @@ func (r *queryResolver) Papers(ctx context.Context) ([]*model.Paper, error) {
 			title_primary,
 			title_secondary,
 			created_at
-		FROM papers;
+		FROM public.papers;
 	`
 
 	rows, err := db.LogAndQuery(r.db, sql)

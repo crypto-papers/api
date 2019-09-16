@@ -159,7 +159,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, data model.FileCreate
 	}
 
 	sql := `
-		INSERT INTO files (
+		INSERT INTO public.files (
 			cover_image,
 			filename,
 			is_latest,
@@ -205,7 +205,7 @@ func (r *mutationResolver) CreatePaper(ctx context.Context, data model.PaperCrea
 	}
 
 	sql := `
-		INSERT INTO papers (
+		INSERT INTO public.papers (
 			description,
 			excerpt,
 			latest_version,
@@ -247,7 +247,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, data model.UserCreate
 	}
 
 	sql := `
-		INSERT INTO users (
+		INSERT INTO public.users (
 			user_name,
 			email,
 			password,

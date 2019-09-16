@@ -15,7 +15,7 @@ func (r *mutationResolver) DeleteAsset(ctx context.Context, id model.AssetWhereU
 
 	_, err := db.LogAndQuery(
 		r.db,
-		"DELETE FROM assets WHERE id = $1",
+		"DELETE FROM public.assets WHERE id = $1",
 		i,
 	)
 
@@ -32,7 +32,7 @@ func (r *mutationResolver) DeleteAuthor(ctx context.Context, id model.AuthorWher
 
 	_, err := db.LogAndQuery(
 		r.db,
-		"DELETE FROM authors WHERE id = $1",
+		"DELETE FROM public.authors WHERE id = $1",
 		i,
 	)
 
@@ -66,7 +66,7 @@ func (r *mutationResolver) DeleteFile(ctx context.Context, id model.FileWhereUni
 
 	_, err := db.LogAndQuery(
 		r.db,
-		"DELETE FROM files WHERE id = $1",
+		"DELETE FROM public.files WHERE id = $1",
 		i,
 	)
 
@@ -83,7 +83,7 @@ func (r *mutationResolver) DeletePaper(ctx context.Context, id model.PaperWhereU
 
 	_, err := db.LogAndQuery(
 		r.db,
-		"DELETE FROM papers WHERE id = $1",
+		"DELETE FROM public.papers WHERE id = $1",
 		i,
 	)
 
@@ -100,7 +100,7 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id model.UserWhereUni
 
 	_, err := db.LogAndQuery(
 		r.db,
-		"DELETE FROM users WHERE id = $1",
+		"DELETE FROM public.users WHERE id = $1",
 		i,
 	)
 

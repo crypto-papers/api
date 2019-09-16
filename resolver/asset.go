@@ -21,7 +21,7 @@ func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, err
 			logo,
 			ticker,
 			created_at
-		FROM assets
+		FROM public.assets
 		WHERE id = $1
 		LIMIT 1;
 	`
@@ -62,7 +62,7 @@ func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
 			logo,
 			ticker,
 			created_at
-		FROM assets;
+		FROM public.assets;
 	`
 
 	rows, err := db.LogAndQuery(r.db, sql)

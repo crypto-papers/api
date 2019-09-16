@@ -20,7 +20,7 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 			user_name,
 			email,
 			created_at
-		FROM users
+		FROM public.users
 		WHERE id = $1
 		LIMIT 1;
 	`
@@ -59,7 +59,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 			user_name,
 			email,
 			created_at
-		FROM users;
+		FROM public.users;
 	`
 	rows, err := db.LogAndQuery(r.db, sql)
 	defer rows.Close()
