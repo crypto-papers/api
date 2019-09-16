@@ -76,6 +76,31 @@ type AuthorWhereUniqueInput struct {
 	ID string `json:"id"`
 }
 
+type Feature struct {
+	ID       string    `json:"id"`
+	Paper    string    `json:"paper"`
+	Promoted *bool     `json:"promoted"`
+	Sponsor  *string   `json:"sponsor"`
+	CreateAt time.Time `json:"createAt"`
+}
+
+type FeatureCreateInput struct {
+	ID       *string `json:"id"`
+	Paper    string  `json:"paper"`
+	Promoted *bool   `json:"promoted"`
+	Sponsor  *string `json:"sponsor"`
+}
+
+type FeatureUpdateInput struct {
+	Paper    *string `json:"paper"`
+	Promoted *bool   `json:"promoted"`
+	Sponsor  *string `json:"sponsor"`
+}
+
+type FeatureWhereUniqueInput struct {
+	ID string `json:"id"`
+}
+
 type File struct {
 	ID         string     `json:"id"`
 	CoverImage *string    `json:"coverImage"`

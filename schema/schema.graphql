@@ -9,6 +9,8 @@ type Query {
   assets: [Asset!]!
   author(id: ID!): Author
   authors: [Author!]!
+  feature(id: ID!): Feature
+  features: [Feature!]
   file(id: ID!): File
   files: [File!]!
   user(id: ID!): User
@@ -29,6 +31,11 @@ type Mutation {
   createAuthor(data: AuthorCreateInput!): Author!
   deleteAuthor(where: AuthorWhereUniqueInput!): ID!
   updateAuthor(data: AuthorUpdateInput!): Author!
+
+  # Feature mutations
+  createFeature(data: FeatureCreateInput!): Feature!
+  deleteFeature(where: FeatureWhereUniqueInput!): ID!
+  updateFeature(data: FeatureUpdateInput!): Feature!
 
   # File mutations
   createFile(data: FileCreateInput!): File!

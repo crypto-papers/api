@@ -43,6 +43,23 @@ func (r *mutationResolver) DeleteAuthor(ctx context.Context, id model.AuthorWher
 	return i, nil
 }
 
+// DeleteFeature removes a featured item from the database based on the feature id
+func (r *mutationResolver) DeleteFeature(ctx context.Context, id model.FeatureWhereUniqueInput) (string, error) {
+	i := id.ID
+
+	_, err := db.LogAndQuery(
+		r.db,
+		"DELETE FROM public.features WHERE id = $1",
+		i,
+	)
+
+	if err != nil {
+		return i, err
+	}
+
+	return i, nil
+}
+
 // DeleteFile removes a file from the database based on the file id
 func (r *mutationResolver) DeleteFile(ctx context.Context, id model.FileWhereUniqueInput) (string, error) {
 	i := id.ID

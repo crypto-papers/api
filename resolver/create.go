@@ -20,7 +20,7 @@ func (r *mutationResolver) CreateAsset(ctx context.Context, data model.AssetCrea
 	}
 
 	sql := `
-		INSERT INTO assets (
+		INSERT INTO public.assets (
 			asset_name,
 			logo,
 			ticker,
@@ -57,7 +57,7 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 	}
 
 	authorSQL := `
-		INSERT INTO authors (
+		INSERT INTO public.authors (
 			author_name,
 			bio,
 			photo,
@@ -66,6 +66,14 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 		)
 		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id;
+	`
+
+	paperSQL := `
+		INSERT INTO public.author_paper (
+			author_id,
+			paper_id
+		)
+		VALUES ($1, $2);
 	`
 
 	authorID, err := db.LogQueryAndScan(
@@ -89,7 +97,7 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 
 		row, err := db.LogAndQuery(
 			r.db,
-			"INSERT INTO author_paper (author_id, paper_id) VALUES ($1, $2)",
+			paperSQL,
 			authorID,
 			paperID,
 		)
@@ -100,6 +108,42 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 	}
 
 	return author, nil
+}
+
+func (r *mutationResolver) CreateFeature(ctx context.Context, data model.FeatureCreateInput) (*model.Feature, error) {
+	feature := &model.Feature{
+		Paper:    data.Paper,
+		Promoted: data.Promoted,
+		Sponsor:  data.Sponsor,
+		CreateAt: time.Now(),
+	}
+
+	sql := `
+		INSERT INTO public.features (
+			paper_id,
+			promoted,
+			sponsor,
+			created_at
+		)
+		VALUES ($1, $2, $3, $4)
+	`
+
+	featureID, err := db.LogQueryAndScan(
+		r.db,
+		sql,
+		feature.Paper,
+		feature.Promoted,
+		feature.Sponsor,
+		feature.CreateAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	feature.ID = featureID
+
+	return feature, nil
 }
 
 // CreateFile accepts file data values and creates a file entry in the database

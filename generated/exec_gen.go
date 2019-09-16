@@ -61,6 +61,14 @@ type ComplexityRoot struct {
 		Psuedonym func(childComplexity int) int
 	}
 
+	Feature struct {
+		CreateAt func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Paper    func(childComplexity int) int
+		Promoted func(childComplexity int) int
+		Sponsor  func(childComplexity int) int
+	}
+
 	File struct {
 		CoverImage func(childComplexity int) int
 		CreateAt   func(childComplexity int) int
@@ -74,21 +82,24 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateAsset  func(childComplexity int, data model.AssetCreateInput) int
-		CreateAuthor func(childComplexity int, data model.AuthorCreateInput) int
-		CreateFile   func(childComplexity int, data model.FileCreateInput) int
-		CreatePaper  func(childComplexity int, data model.PaperCreateInput) int
-		CreateUser   func(childComplexity int, data model.UserCreateInput) int
-		DeleteAsset  func(childComplexity int, where model.AssetWhereUniqueInput) int
-		DeleteAuthor func(childComplexity int, where model.AuthorWhereUniqueInput) int
-		DeleteFile   func(childComplexity int, where model.FileWhereUniqueInput) int
-		DeletePaper  func(childComplexity int, where model.PaperWhereUniqueInput) int
-		DeleteUser   func(childComplexity int, where model.UserWhereUniqueInput) int
-		UpdateAsset  func(childComplexity int, data model.AssetUpdateInput) int
-		UpdateAuthor func(childComplexity int, data model.AuthorUpdateInput) int
-		UpdateFile   func(childComplexity int, data model.FileUpdateInput) int
-		UpdatePaper  func(childComplexity int, data model.PaperUpdateInput) int
-		UpdateUser   func(childComplexity int, data model.UserUpdateInput) int
+		CreateAsset   func(childComplexity int, data model.AssetCreateInput) int
+		CreateAuthor  func(childComplexity int, data model.AuthorCreateInput) int
+		CreateFeature func(childComplexity int, data model.FeatureCreateInput) int
+		CreateFile    func(childComplexity int, data model.FileCreateInput) int
+		CreatePaper   func(childComplexity int, data model.PaperCreateInput) int
+		CreateUser    func(childComplexity int, data model.UserCreateInput) int
+		DeleteAsset   func(childComplexity int, where model.AssetWhereUniqueInput) int
+		DeleteAuthor  func(childComplexity int, where model.AuthorWhereUniqueInput) int
+		DeleteFeature func(childComplexity int, where model.FeatureWhereUniqueInput) int
+		DeleteFile    func(childComplexity int, where model.FileWhereUniqueInput) int
+		DeletePaper   func(childComplexity int, where model.PaperWhereUniqueInput) int
+		DeleteUser    func(childComplexity int, where model.UserWhereUniqueInput) int
+		UpdateAsset   func(childComplexity int, data model.AssetUpdateInput) int
+		UpdateAuthor  func(childComplexity int, data model.AuthorUpdateInput) int
+		UpdateFeature func(childComplexity int, data model.FeatureUpdateInput) int
+		UpdateFile    func(childComplexity int, data model.FileUpdateInput) int
+		UpdatePaper   func(childComplexity int, data model.PaperUpdateInput) int
+		UpdateUser    func(childComplexity int, data model.UserUpdateInput) int
 	}
 
 	Paper struct {
@@ -107,6 +118,8 @@ type ComplexityRoot struct {
 		Assets     func(childComplexity int) int
 		Author     func(childComplexity int, id string) int
 		Authors    func(childComplexity int) int
+		Feature    func(childComplexity int, id string) int
+		Features   func(childComplexity int) int
 		File       func(childComplexity int, id string) int
 		Files      func(childComplexity int) int
 		Paper      func(childComplexity int, id string) int
@@ -132,6 +145,9 @@ type MutationResolver interface {
 	CreateAuthor(ctx context.Context, data model.AuthorCreateInput) (*model.Author, error)
 	DeleteAuthor(ctx context.Context, where model.AuthorWhereUniqueInput) (string, error)
 	UpdateAuthor(ctx context.Context, data model.AuthorUpdateInput) (*model.Author, error)
+	CreateFeature(ctx context.Context, data model.FeatureCreateInput) (*model.Feature, error)
+	DeleteFeature(ctx context.Context, where model.FeatureWhereUniqueInput) (string, error)
+	UpdateFeature(ctx context.Context, data model.FeatureUpdateInput) (*model.Feature, error)
 	CreateFile(ctx context.Context, data model.FileCreateInput) (*model.File, error)
 	DeleteFile(ctx context.Context, where model.FileWhereUniqueInput) (string, error)
 	UpdateFile(ctx context.Context, data model.FileUpdateInput) (*model.File, error)
@@ -147,6 +163,8 @@ type QueryResolver interface {
 	Assets(ctx context.Context) ([]*model.Asset, error)
 	Author(ctx context.Context, id string) (*model.Author, error)
 	Authors(ctx context.Context) ([]*model.Author, error)
+	Feature(ctx context.Context, id string) (*model.Feature, error)
+	Features(ctx context.Context) ([]*model.Feature, error)
 	File(ctx context.Context, id string) (*model.File, error)
 	Files(ctx context.Context) ([]*model.File, error)
 	User(ctx context.Context, id string) (*model.User, error)
@@ -248,6 +266,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.Psuedonym(childComplexity), true
 
+	case "Feature.createAt":
+		if e.complexity.Feature.CreateAt == nil {
+			break
+		}
+
+		return e.complexity.Feature.CreateAt(childComplexity), true
+
+	case "Feature.id":
+		if e.complexity.Feature.ID == nil {
+			break
+		}
+
+		return e.complexity.Feature.ID(childComplexity), true
+
+	case "Feature.paper":
+		if e.complexity.Feature.Paper == nil {
+			break
+		}
+
+		return e.complexity.Feature.Paper(childComplexity), true
+
+	case "Feature.promoted":
+		if e.complexity.Feature.Promoted == nil {
+			break
+		}
+
+		return e.complexity.Feature.Promoted(childComplexity), true
+
+	case "Feature.sponsor":
+		if e.complexity.Feature.Sponsor == nil {
+			break
+		}
+
+		return e.complexity.Feature.Sponsor(childComplexity), true
+
 	case "File.coverImage":
 		if e.complexity.File.CoverImage == nil {
 			break
@@ -335,6 +388,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateAuthor(childComplexity, args["data"].(model.AuthorCreateInput)), true
 
+	case "Mutation.createFeature":
+		if e.complexity.Mutation.CreateFeature == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createFeature_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateFeature(childComplexity, args["data"].(model.FeatureCreateInput)), true
+
 	case "Mutation.createFile":
 		if e.complexity.Mutation.CreateFile == nil {
 			break
@@ -395,6 +460,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteAuthor(childComplexity, args["where"].(model.AuthorWhereUniqueInput)), true
 
+	case "Mutation.deleteFeature":
+		if e.complexity.Mutation.DeleteFeature == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteFeature_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteFeature(childComplexity, args["where"].(model.FeatureWhereUniqueInput)), true
+
 	case "Mutation.deleteFile":
 		if e.complexity.Mutation.DeleteFile == nil {
 			break
@@ -454,6 +531,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateAuthor(childComplexity, args["data"].(model.AuthorUpdateInput)), true
+
+	case "Mutation.updateFeature":
+		if e.complexity.Mutation.UpdateFeature == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateFeature_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateFeature(childComplexity, args["data"].(model.FeatureUpdateInput)), true
 
 	case "Mutation.updateFile":
 		if e.complexity.Mutation.UpdateFile == nil {
@@ -584,6 +673,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Authors(childComplexity), true
+
+	case "Query.feature":
+		if e.complexity.Query.Feature == nil {
+			break
+		}
+
+		args, err := ec.field_Query_feature_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Feature(childComplexity, args["id"].(string)), true
+
+	case "Query.features":
+		if e.complexity.Query.Features == nil {
+			break
+		}
+
+		return e.complexity.Query.Features(childComplexity), true
 
 	case "Query.file":
 		if e.complexity.Query.File == nil {
@@ -838,6 +946,32 @@ input AuthorWhereUniqueInput {
   id: ID!
 }
 `},
+	&ast.Source{Name: "schema/feature.graphql", Input: `type Feature {
+  id: ID!
+  paper: ID!
+  promoted: Boolean
+  sponsor: String
+  createAt: Time!
+}
+
+# Inputs for feature mutations
+input FeatureCreateInput {
+  id: ID
+  paper: ID!
+  promoted: Boolean
+  sponsor: String
+}
+
+input FeatureUpdateInput {
+  paper: ID
+  promoted: Boolean
+  sponsor: String
+}
+
+input FeatureWhereUniqueInput {
+  id: ID!
+}
+`},
 	&ast.Source{Name: "schema/file.graphql", Input: `type File {
   id: ID!
   coverImage: String
@@ -936,6 +1070,8 @@ type Query {
   assets: [Asset!]!
   author(id: ID!): Author
   authors: [Author!]!
+  feature(id: ID!): Feature
+  features: [Feature!]
   file(id: ID!): File
   files: [File!]!
   user(id: ID!): User
@@ -956,6 +1092,11 @@ type Mutation {
   createAuthor(data: AuthorCreateInput!): Author!
   deleteAuthor(where: AuthorWhereUniqueInput!): ID!
   updateAuthor(data: AuthorUpdateInput!): Author!
+
+  # Feature mutations
+  createFeature(data: FeatureCreateInput!): Feature!
+  deleteFeature(where: FeatureWhereUniqueInput!): ID!
+  updateFeature(data: FeatureUpdateInput!): Feature!
 
   # File mutations
   createFile(data: FileCreateInput!): File!
@@ -1036,6 +1177,20 @@ func (ec *executionContext) field_Mutation_createAuthor_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createFeature_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.FeatureCreateInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNFeatureCreateInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeatureCreateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1106,6 +1261,20 @@ func (ec *executionContext) field_Mutation_deleteAuthor_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteFeature_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.FeatureWhereUniqueInput
+	if tmp, ok := rawArgs["where"]; ok {
+		arg0, err = ec.unmarshalNFeatureWhereUniqueInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeatureWhereUniqueInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1168,6 +1337,20 @@ func (ec *executionContext) field_Mutation_updateAuthor_args(ctx context.Context
 	var arg0 model.AuthorUpdateInput
 	if tmp, ok := rawArgs["data"]; ok {
 		arg0, err = ec.unmarshalNAuthorUpdateInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthorUpdateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateFeature_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.FeatureUpdateInput
+	if tmp, ok := rawArgs["data"]; ok {
+		arg0, err = ec.unmarshalNFeatureUpdateInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeatureUpdateInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1247,6 +1430,20 @@ func (ec *executionContext) field_Query_asset_args(ctx context.Context, rawArgs 
 }
 
 func (ec *executionContext) field_Query_author_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_feature_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1611,6 +1808,135 @@ func (ec *executionContext) _Author_createAt(ctx context.Context, field graphql.
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
 		Object:   "Author",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateAt, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Feature_id(ctx context.Context, field graphql.CollectedField, obj *model.Feature) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Feature",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Feature_paper(ctx context.Context, field graphql.CollectedField, obj *model.Feature) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Feature",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Paper, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Feature_promoted(ctx context.Context, field graphql.CollectedField, obj *model.Feature) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Feature",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promoted, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Feature_sponsor(ctx context.Context, field graphql.CollectedField, obj *model.Feature) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Feature",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Sponsor, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Feature_createAt(ctx context.Context, field graphql.CollectedField, obj *model.Feature) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Feature",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -2060,6 +2386,108 @@ func (ec *executionContext) _Mutation_updateAuthor(ctx context.Context, field gr
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNAuthor2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createFeature(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createFeature_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateFeature(rctx, args["data"].(model.FeatureCreateInput))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Feature)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFeature2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteFeature(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteFeature_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteFeature(rctx, args["where"].(model.FeatureWhereUniqueInput))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateFeature(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateFeature_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateFeature(rctx, args["data"].(model.FeatureUpdateInput))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Feature)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFeature2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createFile(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2683,6 +3111,61 @@ func (ec *executionContext) _Query_authors(ctx context.Context, field graphql.Co
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNAuthor2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAuthor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_feature(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_feature_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Feature(rctx, args["id"].(string))
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Feature)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOFeature2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_features(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Features(rctx)
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Feature)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOFeature2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_file(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -4175,6 +4658,90 @@ func (ec *executionContext) unmarshalInputAuthorWhereUniqueInput(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputFeatureCreateInput(ctx context.Context, v interface{}) (model.FeatureCreateInput, error) {
+	var it model.FeatureCreateInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "paper":
+			var err error
+			it.Paper, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "promoted":
+			var err error
+			it.Promoted, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sponsor":
+			var err error
+			it.Sponsor, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputFeatureUpdateInput(ctx context.Context, v interface{}) (model.FeatureUpdateInput, error) {
+	var it model.FeatureUpdateInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "paper":
+			var err error
+			it.Paper, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "promoted":
+			var err error
+			it.Promoted, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sponsor":
+			var err error
+			it.Sponsor, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputFeatureWhereUniqueInput(ctx context.Context, v interface{}) (model.FeatureWhereUniqueInput, error) {
+	var it model.FeatureWhereUniqueInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFileCreateInput(ctx context.Context, v interface{}) (model.FileCreateInput, error) {
 	var it model.FileCreateInput
 	var asMap = v.(map[string]interface{})
@@ -4672,6 +5239,47 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var featureImplementors = []string{"Feature"}
+
+func (ec *executionContext) _Feature(ctx context.Context, sel ast.SelectionSet, obj *model.Feature) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, featureImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Feature")
+		case "id":
+			out.Values[i] = ec._Feature_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "paper":
+			out.Values[i] = ec._Feature_paper(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "promoted":
+			out.Values[i] = ec._Feature_promoted(ctx, field, obj)
+		case "sponsor":
+			out.Values[i] = ec._Feature_sponsor(ctx, field, obj)
+		case "createAt":
+			out.Values[i] = ec._Feature_createAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var fileImplementors = []string{"File"}
 
 func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj *model.File) graphql.Marshaler {
@@ -4763,6 +5371,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateAuthor":
 			out.Values[i] = ec._Mutation_updateAuthor(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createFeature":
+			out.Values[i] = ec._Mutation_createFeature(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteFeature":
+			out.Values[i] = ec._Mutation_deleteFeature(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateFeature":
+			out.Values[i] = ec._Mutation_updateFeature(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4932,6 +5555,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "feature":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_feature(ctx, field)
+				return res
+			})
+		case "features":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_features(ctx, field)
 				return res
 			})
 		case "file":
@@ -5497,6 +6142,32 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNFeature2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx context.Context, sel ast.SelectionSet, v model.Feature) graphql.Marshaler {
+	return ec._Feature(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFeature2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx context.Context, sel ast.SelectionSet, v *model.Feature) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Feature(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFeatureCreateInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeatureCreateInput(ctx context.Context, v interface{}) (model.FeatureCreateInput, error) {
+	return ec.unmarshalInputFeatureCreateInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNFeatureUpdateInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeatureUpdateInput(ctx context.Context, v interface{}) (model.FeatureUpdateInput, error) {
+	return ec.unmarshalInputFeatureUpdateInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNFeatureWhereUniqueInput2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeatureWhereUniqueInput(ctx context.Context, v interface{}) (model.FeatureWhereUniqueInput, error) {
+	return ec.unmarshalInputFeatureWhereUniqueInput(ctx, v)
 }
 
 func (ec *executionContext) marshalNFile2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v model.File) graphql.Marshaler {
@@ -6125,6 +6796,57 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOFeature2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx context.Context, sel ast.SelectionSet, v model.Feature) graphql.Marshaler {
+	return ec._Feature(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOFeature2ᚕᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx context.Context, sel ast.SelectionSet, v []*model.Feature) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFeature2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOFeature2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx context.Context, sel ast.SelectionSet, v *model.Feature) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Feature(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOFile2githubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v model.File) graphql.Marshaler {

@@ -57,7 +57,7 @@ var papersQuery = `
 		id uuid DEFAULT uuid_generate_v4 (),
 		description TEXT,
 		excerpt TEXT,
-		latest_version uuid,
+		latest_version uuid REFERENCES files (id) ON UPDATE CASCADE,
 		pretty_id SERIAL,
 		title_primary VARCHAR(255),
 		title_secondary VARCHAR(255),
@@ -75,6 +75,17 @@ var usersQuery = `
 		created_at TIMESTAMPTZ,
 		PRIMARY KEY (id)
 	);
+`
+
+var featuresQuery = `
+	CREATE TABLE IF NOT EXISTS public.features (
+		id uuid DEFAULT uuid_generate_v4 (),
+		paper_id uuid REFERENCES papers (id) ON UPDATE CASCADE,
+		promoted BOOL,
+		sponsor VARCHAR(255),
+		created_at TIMESTAMPTZ,
+		PRIMARY KEY (id)
+	)
 `
 
 var authorsPapersQuery = `
@@ -100,6 +111,7 @@ func schemaOne(db *sql.DB) {
 	ExecQuery(db, filesQuery)
 	ExecQuery(db, papersQuery)
 	ExecQuery(db, usersQuery)
+	ExecQuery(db, featuresQuery)
 	// Create connection tables
 	ExecQuery(db, authorsPapersQuery)
 

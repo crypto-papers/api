@@ -16,6 +16,10 @@ func (r *mutationResolver) UpdateAuthor(context.Context, model.AuthorUpdateInput
 	panic("not implemented")
 }
 
+func (r *mutationResolver) UpdateFeature(context.Context, model.FeatureUpdateInput) (*model.Feature, error) {
+	panic("not implemented")
+}
+
 func (r *mutationResolver) UpdateFile(context.Context, model.FileUpdateInput) (*model.File, error) {
 	panic("not implemented")
 }
