@@ -51,6 +51,47 @@ func (r *queryResolver) Asset(ctx context.Context, id string) (*model.Asset, err
 	return asset, nil
 }
 
+// Asset returns data on an individual asset based on a specified asset ticker
+func (r *queryResolver) AssetByTicker(ctx context.Context, ticker string) (*model.Asset, error) {
+	var asset = new(model.Asset)
+
+	sql := `
+		SELECT
+			id,
+			asset_name,
+			logo,
+			ticker,
+			created_at
+		FROM public.assets
+		WHERE ticker = $1
+		LIMIT 1;
+	`
+
+	row, err := db.LogAndQuery(r.db, sql, ticker)
+	defer row.Close()
+
+	if err != nil {
+		errors.DebugError(err)
+		return nil, errors.InternalServerError
+	}
+
+	for row.Next() {
+		err := row.Scan(
+			&asset.ID,
+			&asset.Name,
+			&asset.Logo,
+			&asset.Ticker,
+			&asset.CreateAt,
+		)
+		if err != nil {
+			errors.DebugError(err)
+			return nil, errors.InternalServerError
+		}
+	}
+
+	return asset, nil
+}
+
 // Assets returns a list of assets with their data
 func (r *queryResolver) Assets(ctx context.Context) ([]*model.Asset, error) {
 	var assets []*model.Asset

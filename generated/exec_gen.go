@@ -114,19 +114,20 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Asset      func(childComplexity int, id string) int
-		Assets     func(childComplexity int) int
-		Author     func(childComplexity int, id string) int
-		Authors    func(childComplexity int) int
-		Feature    func(childComplexity int, id string) int
-		Features   func(childComplexity int) int
-		File       func(childComplexity int, id string) int
-		Files      func(childComplexity int) int
-		Paper      func(childComplexity int, id string) int
-		PaperByPid func(childComplexity int, prettyID int) int
-		Papers     func(childComplexity int) int
-		User       func(childComplexity int, id string) int
-		Users      func(childComplexity int) int
+		Asset         func(childComplexity int, id string) int
+		AssetByTicker func(childComplexity int, ticker string) int
+		Assets        func(childComplexity int) int
+		Author        func(childComplexity int, id string) int
+		Authors       func(childComplexity int) int
+		Feature       func(childComplexity int, id string) int
+		Features      func(childComplexity int) int
+		File          func(childComplexity int, id string) int
+		Files         func(childComplexity int) int
+		Paper         func(childComplexity int, id string) int
+		PaperByPid    func(childComplexity int, prettyID int) int
+		Papers        func(childComplexity int) int
+		User          func(childComplexity int, id string) int
+		Users         func(childComplexity int) int
 	}
 
 	User struct {
@@ -160,6 +161,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Asset(ctx context.Context, id string) (*model.Asset, error)
+	AssetByTicker(ctx context.Context, ticker string) (*model.Asset, error)
 	Assets(ctx context.Context) ([]*model.Asset, error)
 	Author(ctx context.Context, id string) (*model.Author, error)
 	Authors(ctx context.Context) ([]*model.Author, error)
@@ -648,6 +650,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Asset(childComplexity, args["id"].(string)), true
 
+	case "Query.assetByTicker":
+		if e.complexity.Query.AssetByTicker == nil {
+			break
+		}
+
+		args, err := ec.field_Query_assetByTicker_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AssetByTicker(childComplexity, args["ticker"].(string)), true
+
 	case "Query.assets":
 		if e.complexity.Query.Assets == nil {
 			break
@@ -914,7 +928,7 @@ input AssetWhereUniqueInput {
 	&ast.Source{Name: "schema/author.graphql", Input: `type Author {
   id: ID!
   bio: String
-  name: String!
+  name: String
   photo: String
   psuedonym: Boolean
   createAt: Time!
@@ -924,7 +938,7 @@ input AssetWhereUniqueInput {
 input AuthorCreateInput {
   id: ID
   bio: String
-  name: String!
+  name: String
   papers: PaperCreateManyInput
   photo: String
   psuedonym: Boolean
@@ -1066,16 +1080,28 @@ input PaperWhereUniqueInput {
 
 # List of available queries
 type Query {
+  # Asset queries
   asset(id: ID!): Asset
+  assetByTicker(ticker: String!): Asset
   assets: [Asset!]!
+
+  # Author queries
   author(id: ID!): Author
   authors: [Author!]!
+
+  # Feature queries
   feature(id: ID!): Feature
   features: [Feature!]
+
+  # File queries
   file(id: ID!): File
   files: [File!]!
+
+  # User queries
   user(id: ID!): User
   users: [User!]!
+
+  # Paper queries
   paper(id: ID!): Paper
   paperByPid(prettyId: Int!): Paper
   papers: [Paper!]!
@@ -1415,6 +1441,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_assetByTicker_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["ticker"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ticker"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_asset_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1744,15 +1784,12 @@ func (ec *executionContext) _Author_name(ctx context.Context, field graphql.Coll
 		return obj.Name, nil
 	})
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Author_photo(ctx context.Context, field graphql.CollectedField, obj *model.Author) graphql.Marshaler {
@@ -3018,6 +3055,37 @@ func (ec *executionContext) _Query_asset(ctx context.Context, field graphql.Coll
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Asset(rctx, args["id"].(string))
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Asset)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOAsset2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐAsset(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_assetByTicker(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_assetByTicker_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AssetByTicker(rctx, args["ticker"].(string))
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -4552,7 +4620,7 @@ func (ec *executionContext) unmarshalInputAuthorCreateInput(ctx context.Context,
 			}
 		case "name":
 			var err error
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5216,9 +5284,6 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Author_bio(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._Author_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "photo":
 			out.Values[i] = ec._Author_photo(ctx, field, obj)
 		case "psuedonym":
@@ -5516,6 +5581,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_asset(ctx, field)
+				return res
+			})
+		case "assetByTicker":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_assetByTicker(ctx, field)
 				return res
 			})
 		case "assets":

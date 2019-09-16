@@ -1,7 +1,7 @@
 type Author {
   id: ID!
   bio: String
-  name: String!
+  name: String
   photo: String
   psuedonym: Boolean
   createAt: Time!
@@ -11,7 +11,7 @@ type Author {
 input AuthorCreateInput {
   id: ID
   bio: String
-  name: String!
+  name: String
   papers: PaperCreateManyInput
   photo: String
   psuedonym: Boolean

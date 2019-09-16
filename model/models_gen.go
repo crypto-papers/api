@@ -45,7 +45,7 @@ type AssetWhereUniqueInput struct {
 type Author struct {
 	ID        string    `json:"id"`
 	Bio       *string   `json:"bio"`
-	Name      string    `json:"name"`
+	Name      *string   `json:"name"`
 	Photo     *string   `json:"photo"`
 	Psuedonym *bool     `json:"psuedonym"`
 	CreateAt  time.Time `json:"createAt"`
@@ -54,7 +54,7 @@ type Author struct {
 type AuthorCreateInput struct {
 	ID        *string               `json:"id"`
 	Bio       *string               `json:"bio"`
-	Name      string                `json:"name"`
+	Name      *string               `json:"name"`
 	Papers    *PaperCreateManyInput `json:"papers"`
 	Photo     *string               `json:"photo"`
 	Psuedonym *bool                 `json:"psuedonym"`
