@@ -120,6 +120,7 @@ type ComplexityRoot struct {
 		Author        func(childComplexity int, id string) int
 		Authors       func(childComplexity int) int
 		Feature       func(childComplexity int, id string) int
+		FeatureLatest func(childComplexity int) int
 		Features      func(childComplexity int) int
 		File          func(childComplexity int, id string) int
 		Files         func(childComplexity int) int
@@ -166,6 +167,7 @@ type QueryResolver interface {
 	Author(ctx context.Context, id string) (*model.Author, error)
 	Authors(ctx context.Context) ([]*model.Author, error)
 	Feature(ctx context.Context, id string) (*model.Feature, error)
+	FeatureLatest(ctx context.Context) (*model.Feature, error)
 	Features(ctx context.Context) ([]*model.Feature, error)
 	File(ctx context.Context, id string) (*model.File, error)
 	Files(ctx context.Context) ([]*model.File, error)
@@ -700,6 +702,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Feature(childComplexity, args["id"].(string)), true
 
+	case "Query.featureLatest":
+		if e.complexity.Query.FeatureLatest == nil {
+			break
+		}
+
+		return e.complexity.Query.FeatureLatest(childComplexity), true
+
 	case "Query.features":
 		if e.complexity.Query.Features == nil {
 			break
@@ -963,7 +972,7 @@ input AuthorWhereUniqueInput {
 	&ast.Source{Name: "schema/feature.graphql", Input: `type Feature {
   id: ID!
   paper: ID!
-  promoted: Boolean
+  promoted: Boolean!
   sponsor: String
   createAt: Time!
 }
@@ -1091,6 +1100,7 @@ type Query {
 
   # Feature queries
   feature(id: ID!): Feature
+  featureLatest: Feature
   features: [Feature!]
 
   # File queries
@@ -1937,12 +1947,15 @@ func (ec *executionContext) _Feature_promoted(ctx context.Context, field graphql
 		return obj.Promoted, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Feature_sponsor(ctx context.Context, field graphql.CollectedField, obj *model.Feature) graphql.Marshaler {
@@ -3202,6 +3215,30 @@ func (ec *executionContext) _Query_feature(ctx context.Context, field graphql.Co
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Feature(rctx, args["id"].(string))
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Feature)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOFeature2ᚖgithubᚗcomᚋcryptoᚑpapersᚋapiᚋmodelᚐFeature(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_featureLatest(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FeatureLatest(rctx)
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -5327,6 +5364,9 @@ func (ec *executionContext) _Feature(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "promoted":
 			out.Values[i] = ec._Feature_promoted(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "sponsor":
 			out.Values[i] = ec._Feature_sponsor(ctx, field, obj)
 		case "createAt":
@@ -5642,6 +5682,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_feature(ctx, field)
+				return res
+			})
+		case "featureLatest":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_featureLatest(ctx, field)
 				return res
 			})
 		case "features":

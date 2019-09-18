@@ -1,7 +1,7 @@
 type Feature {
   id: ID!
   paper: ID!
-  promoted: Boolean
+  promoted: Boolean!
   sponsor: String
   createAt: Time!
 }

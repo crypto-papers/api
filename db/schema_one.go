@@ -80,7 +80,7 @@ var usersQuery = `
 var featuresQuery = `
 	CREATE TABLE IF NOT EXISTS public.features (
 		id uuid DEFAULT uuid_generate_v4 (),
-		paper_id uuid REFERENCES papers (id) ON UPDATE CASCADE,
+		paper_id uuid REFERENCES public.papers (id) ON UPDATE CASCADE,
 		promoted BOOL,
 		sponsor VARCHAR(255),
 		created_at TIMESTAMPTZ,

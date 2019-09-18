@@ -79,7 +79,7 @@ type AuthorWhereUniqueInput struct {
 type Feature struct {
 	ID       string    `json:"id"`
 	Paper    string    `json:"paper"`
-	Promoted *bool     `json:"promoted"`
+	Promoted bool      `json:"promoted"`
 	Sponsor  *string   `json:"sponsor"`
 	CreateAt time.Time `json:"createAt"`
 }

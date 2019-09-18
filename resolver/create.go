@@ -68,19 +68,19 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 		RETURNING id;
 	`
 
-	paperSQL := `
-		INSERT INTO public.author_paper (
-			author_id,
-			paper_id
-		)
-		VALUES ($1, $2);
-	`
+	// paperSQL := `
+	// 	INSERT INTO public.author_paper (
+	// 		author_id,
+	// 		paper_id
+	// 	)
+	// 	VALUES ($1, $2);
+	// `
 
 	authorID, err := db.LogQueryAndScan(
 		r.db,
 		authorSQL,
-		author.Bio,
 		author.Name,
+		author.Bio,
 		author.Photo,
 		author.Psuedonym,
 		author.CreateAt,
@@ -91,21 +91,21 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 
 	author.ID = authorID
 
-	papers := data.Papers.Connect
-	for _, paper := range papers {
-		paperID := paper.ID
+	// papers := data.Papers.Connect
+	// for _, paper := range papers {
+	// 	paperID := paper.ID
 
-		row, err := db.LogAndQuery(
-			r.db,
-			paperSQL,
-			authorID,
-			paperID,
-		)
+	// 	row, err := db.LogAndQuery(
+	// 		r.db,
+	// 		paperSQL,
+	// 		authorID,
+	// 		paperID,
+	// 	)
 
-		if err != nil || !row.Next() {
-			return author, err
-		}
-	}
+	// 	if err != nil || !row.Next() {
+	// 		return author, err
+	// 	}
+	// }
 
 	return author, nil
 }

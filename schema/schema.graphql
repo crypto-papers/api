@@ -16,6 +16,7 @@ type Query {
 
   # Feature queries
   feature(id: ID!): Feature
+  featureLatest: Feature
   features: [Feature!]
 
   # File queries
