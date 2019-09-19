@@ -87,7 +87,7 @@ type Feature struct {
 type FeatureCreateInput struct {
 	ID       *string `json:"id"`
 	Paper    string  `json:"paper"`
-	Promoted *bool   `json:"promoted"`
+	Promoted bool    `json:"promoted"`
 	Sponsor  *string `json:"sponsor"`
 }
 

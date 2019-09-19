@@ -10,7 +10,7 @@ type Feature {
 input FeatureCreateInput {
   id: ID
   paper: ID!
-  promoted: Boolean
+  promoted: Boolean!
   sponsor: String
 }
 

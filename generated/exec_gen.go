@@ -981,7 +981,7 @@ input AuthorWhereUniqueInput {
 input FeatureCreateInput {
   id: ID
   paper: ID!
-  promoted: Boolean
+  promoted: Boolean!
   sponsor: String
 }
 
@@ -4783,7 +4783,7 @@ func (ec *executionContext) unmarshalInputFeatureCreateInput(ctx context.Context
 			}
 		case "promoted":
 			var err error
-			it.Promoted, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			it.Promoted, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
