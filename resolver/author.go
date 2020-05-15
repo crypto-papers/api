@@ -20,7 +20,7 @@ func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, e
 			author_name,
 			bio,
 			photo,
-			psuedonym,
+			pseudonym,
 			created_at
 		FROM public.authors
 		WHERE id = $1
@@ -41,7 +41,7 @@ func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, e
 			&author.Name,
 			&author.Bio,
 			&author.Photo,
-			&author.Psuedonym,
+			&author.Pseudonym,
 			&author.CreateAt,
 		)
 		if err != nil {
@@ -63,7 +63,7 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 			author_name,
 			bio,
 			photo,
-			psuedonym,
+			pseudonym,
 			created_at
 		FROM public.authors;
 	`
@@ -83,7 +83,7 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 			&author.Name,
 			&author.Bio,
 			&author.Photo,
-			&author.Psuedonym,
+			&author.Pseudonym,
 			&author.CreateAt,
 		)
 		if err != nil {

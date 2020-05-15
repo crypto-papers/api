@@ -31,7 +31,7 @@ var authorsQuery = `
 		author_name VARCHAR(255),
 		bio TEXT,
 		photo VARCHAR(255),
-		psuedonym BOOL,
+		pseudonym BOOL,
 		created_at TIMESTAMPTZ,
 		PRIMARY KEY (id)
 	);

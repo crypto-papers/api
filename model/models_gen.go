@@ -47,7 +47,7 @@ type Author struct {
 	Bio       *string   `json:"bio"`
 	Name      *string   `json:"name"`
 	Photo     *string   `json:"photo"`
-	Psuedonym *bool     `json:"psuedonym"`
+	Pseudonym *bool     `json:"pseudonym"`
 	CreateAt  time.Time `json:"createAt"`
 }
 
@@ -57,7 +57,7 @@ type AuthorCreateInput struct {
 	Name      *string               `json:"name"`
 	Papers    *PaperCreateManyInput `json:"papers"`
 	Photo     *string               `json:"photo"`
-	Psuedonym *bool                 `json:"psuedonym"`
+	Pseudonym *bool                 `json:"pseudonym"`
 }
 
 type AuthorCreateManyInput struct {
@@ -69,7 +69,7 @@ type AuthorUpdateInput struct {
 	Bio       *string `json:"bio"`
 	Name      *string `json:"name"`
 	Photo     *string `json:"photo"`
-	Psuedonym *bool   `json:"psuedonym"`
+	Pseudonym *bool   `json:"pseudonym"`
 }
 
 type AuthorWhereUniqueInput struct {

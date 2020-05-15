@@ -52,7 +52,7 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 		Bio:       data.Bio,
 		Name:      data.Name,
 		Photo:     data.Photo,
-		Psuedonym: data.Psuedonym,
+		Pseudonym: data.Pseudonym,
 		CreateAt:  time.Now(),
 	}
 
@@ -61,7 +61,7 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 			author_name,
 			bio,
 			photo,
-			psuedonym,
+			pseudonym,
 			created_at
 		)
 		VALUES ($1, $2, $3, $4, $5)
@@ -82,7 +82,7 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, data model.AuthorCr
 		author.Name,
 		author.Bio,
 		author.Photo,
-		author.Psuedonym,
+		author.Pseudonym,
 		author.CreateAt,
 	)
 	if err != nil {

@@ -58,7 +58,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Photo     func(childComplexity int) int
-		Psuedonym func(childComplexity int) int
+		Pseudonym func(childComplexity int) int
 	}
 
 	Feature struct {
@@ -263,12 +263,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.Photo(childComplexity), true
 
-	case "Author.psuedonym":
-		if e.complexity.Author.Psuedonym == nil {
+	case "Author.pseudonym":
+		if e.complexity.Author.Pseudonym == nil {
 			break
 		}
 
-		return e.complexity.Author.Psuedonym(childComplexity), true
+		return e.complexity.Author.Pseudonym(childComplexity), true
 
 	case "Feature.createAt":
 		if e.complexity.Feature.CreateAt == nil {
@@ -939,7 +939,7 @@ input AssetWhereUniqueInput {
   bio: String
   name: String
   photo: String
-  psuedonym: Boolean
+  pseudonym: Boolean
   createAt: Time!
 }
 
@@ -950,7 +950,7 @@ input AuthorCreateInput {
   name: String
   papers: PaperCreateManyInput
   photo: String
-  psuedonym: Boolean
+  pseudonym: Boolean
 }
 
 input AuthorCreateManyInput {
@@ -962,7 +962,7 @@ input AuthorUpdateInput {
   bio: String
   name: String
   photo: String
-  psuedonym: Boolean
+  pseudonym: Boolean
 }
 
 input AuthorWhereUniqueInput {
@@ -1826,7 +1826,7 @@ func (ec *executionContext) _Author_photo(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Author_psuedonym(ctx context.Context, field graphql.CollectedField, obj *model.Author) graphql.Marshaler {
+func (ec *executionContext) _Author_pseudonym(ctx context.Context, field graphql.CollectedField, obj *model.Author) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1839,7 +1839,7 @@ func (ec *executionContext) _Author_psuedonym(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Psuedonym, nil
+		return obj.Pseudonym, nil
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -4673,9 +4673,9 @@ func (ec *executionContext) unmarshalInputAuthorCreateInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "psuedonym":
+		case "pseudonym":
 			var err error
-			it.Psuedonym, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			it.Pseudonym, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4733,9 +4733,9 @@ func (ec *executionContext) unmarshalInputAuthorUpdateInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "psuedonym":
+		case "pseudonym":
 			var err error
-			it.Psuedonym, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			it.Pseudonym, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5323,8 +5323,8 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Author_name(ctx, field, obj)
 		case "photo":
 			out.Values[i] = ec._Author_photo(ctx, field, obj)
-		case "psuedonym":
-			out.Values[i] = ec._Author_psuedonym(ctx, field, obj)
+		case "pseudonym":
+			out.Values[i] = ec._Author_pseudonym(ctx, field, obj)
 		case "createAt":
 			out.Values[i] = ec._Author_createAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
